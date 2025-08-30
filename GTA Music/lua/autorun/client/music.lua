@@ -14,6 +14,7 @@ local currentIntensity = nil  -- Track current intensity level
 local isChangingSet = false  -- Flag to prevent concurrent set changes
 local nextIntensityTime = 0  -- Time for next random intensity change
 local musicSets = CLIENT and include( "autorun/client/music_data.lua" ) or {}  -- Load music sets only on client
+local expandedCategories = {}
 
 -- Client menu state
 if CLIENT then
@@ -58,6 +59,7 @@ local mathClamp = math.Clamp
 local mathMax = math.max
 local surfaceSetFont = surface.SetFont
 local surfaceGetTextSize = surface.GetTextSize
+local randomIntensityTime = 31
 
 -- Server networking
 if SERVER then
@@ -236,7 +238,7 @@ local function StartStems(set)
     end)
 
     if cvRandomIntensity:GetBool() and currentIntensity then
-        timerCreate("GTAMusic_Randomize_Intensity", mathRandom(30, 45), 0, function()
+        timerCreate("GTAMusic_Randomize_Intensity", randomIntensityTime, 0, function()
             if currentIntensity and musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[currentIntensity] then
                 TriggerIntensity(currentIntensity)
             end
@@ -288,41 +290,66 @@ local function TriggerStem( stem )
 	DebugPrint( "Stem", stem, stemStates[ stem ] and "enabled" or "disabled" )
 end
 
+local comboIndex = {}
+
 -- Trigger stems by intensity level
 local function TriggerIntensity( intensity )
-	local maxStems = musicSets[ currentSet ] and #musicSets[ currentSet ].stems or MAX_STEMS
-	local intensityCombos = musicSets[ currentSet ] and musicSets[ currentSet ].intensity and musicSets[ currentSet ].intensity[ intensity ]
-	if not intensityCombos then
-		DebugPrint( "Invalid intensity or no combinations defined for set:", currentSet, intensity )
-		return
-	end
+    local maxStems = musicSets[currentSet] and #musicSets[currentSet].stems or MAX_STEMS
+    local intensityCombos = musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[intensity]
+    if not intensityCombos then
+        DebugPrint("Invalid intensity or no combinations defined for set:", currentSet, intensity)
+        return
+    end
 
-	local selectedCombo = type( intensityCombos[ 1 ] ) == "table" and intensityCombos[ mathRandom( 1, #intensityCombos ) ] or intensityCombos
-	for i = 1, maxStems do
-		if stemStates[ i ] and not table.HasValue( selectedCombo, i ) then
-			TriggerStem( i )
-		end
-	end
-	for _, stem in ipairs( selectedCombo ) do
-		if not stemStates[ stem ] then
-			TriggerStem( stem )
-		end
-	end
-	currentIntensity = intensity
-	if cvRandomIntensity:GetBool() and musicSets[ currentSet ] and musicSets[ currentSet ].intensity then
-		local interval = mathRandom( 30, 45 )
-		nextIntensityTime = CurTime() + interval
-		timerCreate( "GTAMusic_Randomize_Intensity", interval, 0, function()
-			if currentIntensity and musicSets[ currentSet ] and musicSets[ currentSet ].intensity and musicSets[ currentSet ].intensity[ currentIntensity ] then
-				TriggerIntensity( currentIntensity )
-			end
-		end )
-	else
-		timerRemove( "GTAMusic_Randomize_Intensity" )
-		nextIntensityTime = 0
-	end
-	DebugPrint( "Triggered intensity:", intensity, "| Selected combination:", tableConcat( selectedCombo, ", " ) )
+    -- Initialize combo index for the current set and intensity
+    comboIndex[currentSet] = comboIndex[currentSet] or {}
+    comboIndex[currentSet][intensity] = comboIndex[currentSet][intensity] or 0
+
+    local selectedCombo
+    if type(intensityCombos[1]) == "table" then
+        -- Multiple combinations: select randomly if manual, sequentially if random intensity enabled
+        if cvRandomIntensity:GetBool() then
+            comboIndex[currentSet][intensity] = (comboIndex[currentSet][intensity] % #intensityCombos) + 1
+            selectedCombo = intensityCombos[comboIndex[currentSet][intensity]]
+            DebugPrint("Sequential combo for intensity:", intensity, "| Combo index:", comboIndex[currentSet][intensity], "| Stems:", tableConcat(selectedCombo, ", "))
+        else
+            selectedCombo = intensityCombos[mathRandom(1, #intensityCombos)]
+            DebugPrint("Random combo for intensity:", intensity, "| Stems:", tableConcat(selectedCombo, ", "))
+        end
+    else
+        -- Single combination
+        selectedCombo = intensityCombos
+        DebugPrint("Single combo for intensity:", intensity, "| Stems:", tableConcat(selectedCombo, ", "))
+    end
+
+    -- Apply the selected combination
+    for i = 1, maxStems do
+        if stemStates[i] and not table.HasValue(selectedCombo, i) then
+            TriggerStem(i)
+        end
+    end
+    for _, stem in ipairs(selectedCombo) do
+        if not stemStates[stem] then
+            TriggerStem(stem)
+        end
+    end
+    currentIntensity = intensity
+
+    if cvRandomIntensity:GetBool() and musicSets[currentSet] and musicSets[currentSet].intensity and type(intensityCombos[1]) == "table" then
+        nextIntensityTime = CurTime() + randomIntensityTime
+        timerCreate("GTAMusic_Randomize_Intensity", randomIntensityTime, 1, function()
+            if musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[intensity] then
+                TriggerIntensity(intensity)
+            end
+        end)
+    else
+        timerRemove("GTAMusic_Randomize_Intensity")
+        nextIntensityTime = 0
+    end
+    DebugPrint("Triggered intensity:", intensity, "| Selected combination:", tableConcat(selectedCombo, ", "))
 end
+
+
 
 -- Randomize stems
 local function RandomizeStems()
@@ -718,333 +745,352 @@ if CLIENT then
 			end
 		end ) ]]
 
-	-- Main menu
--- Main menu
--- Track expanded state for categories
-local expandedCategories = {} -- Format: expandedCategories[game][category] = true/false
+	-- Function to populate DListView
+	local function PopulateSetList()
+		GTAMusicMenu.setList:Clear()
+		local categories = {}
+		local sortedSets = {}
+		for set, data in pairs(musicSets) do
+			local game = data.gameOrigin or "Grand Theft Auto V"
+			local category = data.category and data.category ~= "" and data.category or ""
+			categories[game] = categories[game] or {}
+			categories[game][category] = categories[game][category] or {}
+			table.insert(categories[game][category], { set = set, name = data.name })
+			table.insert(sortedSets, { set = set, name = data.name, game = game, category = category })
+		end
 
--- Function to populate DListView
-local function PopulateSetList()
-	GTAMusicMenu.setList:Clear()
-	local categories = {}
-	local sortedSets = {}
-	for set, data in pairs(musicSets) do
-		local game = data.gameOrigin or "Grand Theft Auto V"
-		local category = data.category and data.category ~= "" and data.category or ""
-		categories[game] = categories[game] or {}
-		categories[game][category] = categories[game][category] or {}
-		table.insert(categories[game][category], { set = set, name = data.name })
-		table.insert(sortedSets, { set = set, name = data.name, game = game, category = category })
-	end
-
-	-- Sort sets by game, then category, then name
-	table.sort(sortedSets, function(a, b)
-		if a.game ~= b.game then
-			return a.game < b.game
-		elseif a.category ~= b.category then
-			if a.category == "" then
-				return true
-			elseif b.category == "" then
-				return false
+		-- Sort sets by game, then category, then name
+		table.sort(sortedSets, function(a, b)
+			if a.game ~= b.game then
+				return a.game < b.game
+			elseif a.category ~= b.category then
+				if a.category == "" then
+					return true
+				elseif b.category == "" then
+					return false
+				else
+					return a.category < b.category
+				end
 			else
-				return a.category < b.category
+				return a.name < b.name
 			end
-		else
-			return a.name < b.name
-		end
-	end)
+		end)
 
-	local addedGames = {}
-	local addedCategories = {}
-	local selectedLine = nil
-	for _, entry in ipairs(sortedSets) do
-		if not addedGames[entry.game] then
-			expandedCategories[entry.game] = expandedCategories[entry.game] or {}
-			local header = GTAMusicMenu.setList:AddLine("")
-			header.IsHeader = true
-			header.Paint = function(self, w, h)
-				draw.RoundedBox(4, 0, 0, w, h, Color(50, 50, 50, 255))
-				draw.SimpleText(entry.game, "DermaDefaultBold", 5, h / 2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		local addedGames = {}
+		local addedCategories = {}
+		local selectedLine = nil
+		for _, entry in ipairs(sortedSets) do
+			if not addedGames[entry.game] then
+				expandedCategories[entry.game] = expandedCategories[entry.game] or {}
+				local header = GTAMusicMenu.setList:AddLine("")
+				header.IsHeader = true
+				header.Paint = function(self, w, h)
+					draw.RoundedBox(4, 0, 0, w, h, Color(50, 50, 50, 255))
+					draw.SimpleText(entry.game, "DermaDefaultBold", 5, h / 2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				end
+				header.Columns[1].Paint = function() end
+				header.OnSelect = function() end
+				addedGames[entry.game] = true
 			end
-			header.Columns[1].Paint = function() end
-			header.OnSelect = function() end
-			addedGames[entry.game] = true
-		end
-		if entry.category ~= "" and not addedCategories[entry.game .. "_" .. entry.category] then
-			if expandedCategories[entry.game][entry.category] == nil then
-				expandedCategories[entry.game][entry.category] = false
-			end
-			local header = GTAMusicMenu.setList:AddLine("")
-			header.IsHeader = true
-			header.IsCategory = true
-			header.Game = entry.game
-			header.Category = entry.category
-			header.Paint = function(self, w, h)
-				draw.RoundedBox(4, 0, 0, w, h, Color(60, 60, 60, 255))
-				local prefix = expandedCategories[entry.game][entry.category] and "- " or "+ "
-				draw.SimpleText(prefix .. entry.category, "DermaDefaultBold", 5, h / 2, Color(200, 200, 200), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-			end
-			header.Columns[1].Paint = function() end
-			header.OnMousePressed = function(self, code)
-				if code == MOUSE_LEFT then
-					expandedCategories[entry.game][entry.category] = not expandedCategories[entry.game][entry.category]
-					local selectedSet = currentSet
-					if IsValid(GTAMusicMenu.setList) then
-						PopulateSetList()
-						for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
-							if line.set == selectedSet then
-								GTAMusicMenu.setList:SelectItem(line)
-								break
+			if entry.category ~= "" and not addedCategories[entry.game .. "_" .. entry.category] then
+				if expandedCategories[entry.game][entry.category] == nil then
+					expandedCategories[entry.game][entry.category] = false
+				end
+				local header = GTAMusicMenu.setList:AddLine("")
+				header.IsHeader = true
+				header.IsCategory = true
+				header.Game = entry.game
+				header.Category = entry.category
+				header.Paint = function(self, w, h)
+					draw.RoundedBox(4, 0, 0, w, h, Color(60, 60, 60, 255))
+					local prefix = expandedCategories[entry.game][entry.category] and "- " or "+ "
+					draw.SimpleText(prefix .. entry.category, "DermaDefaultBold", 5, h / 2, Color(200, 200, 200), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				end
+				header.Columns[1].Paint = function() end
+				header.OnMousePressed = function(self, code)
+					if code == MOUSE_LEFT then
+						expandedCategories[entry.game][entry.category] = not expandedCategories[entry.game][entry.category]
+						local selectedSet = currentSet
+						if IsValid(GTAMusicMenu.setList) then
+							PopulateSetList()
+							for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
+								if line.set == selectedSet then
+									GTAMusicMenu.setList:SelectItem(line)
+									break
+								end
 							end
 						end
 					end
 				end
+				addedCategories[entry.game .. "_" .. entry.category] = true
 			end
-			addedCategories[entry.game .. "_" .. entry.category] = true
+			if entry.category == "" or expandedCategories[entry.game][entry.category] then
+				local indent = entry.category == "" and "  " or "    "
+				local line = GTAMusicMenu.setList:AddLine(indent .. entry.name)
+				line.set = entry.set
+				line.Paint = function(self, w, h)
+					local bgColor = self:IsHovered() and Color(100, 100, 100, 255) or (self:IsSelected() and Color(80, 80, 80, 255) or Color(60, 60, 60, 255))
+					draw.RoundedBox(4, 0, 0, w, h, bgColor)
+				end
+				line.Columns[1]:SetFont("DermaDefault")
+				line.Columns[1]:SetColor(Color(255, 255, 255))
+				if entry.set == currentSet then
+					selectedLine = line
+				end
+			end
 		end
-		if entry.category == "" or expandedCategories[entry.game][entry.category] then
-			local indent = entry.category == "" and "  " or "    "
-			local line = GTAMusicMenu.setList:AddLine(indent .. entry.name)
-			line.set = entry.set
-			line.Paint = function(self, w, h)
-				local bgColor = self:IsHovered() and Color(100, 100, 100, 255) or (self:IsSelected() and Color(80, 80, 80, 255) or Color(60, 60, 60, 255))
+		if selectedLine then
+			GTAMusicMenu.setList:SelectItem(selectedLine)
+		end
+	end
+
+	concommandAdd("gtamusic_menu", function()
+		if not musicSets or table.IsEmpty(musicSets) then
+			chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
+			surface.PlaySound("ui/error.wav")
+			return
+		end
+
+		local frame = vguiCreate("DFrame")
+		frame:SetSize(450, 710)
+		frame:Center()
+		frame:SetTitle("GTA Music Controller")
+		frame:SetDraggable(true)
+		frame:ShowCloseButton(true)
+		frame:MakePopup()
+		frame.Paint = function(self, w, h)
+			draw.RoundedBox(8, 0, 0, w, h, Color(25, 25, 25, 240))
+			draw.RoundedBox(8, 0, 0, w, 25, Color(45, 45, 45, 255))
+		end
+
+		-- Music set selection
+		local setLabel = vguiCreate("DLabel", frame)
+		setLabel:SetPos(10, 30)
+		setLabel:SetText("Select Music Set:")
+		setLabel:SetFont("DermaDefaultBold")
+		setLabel:SetColor(Color(255, 255, 255))
+		setLabel:SizeToContents()
+
+		GTAMusicMenu.setList = vguiCreate("DListView", frame)
+		GTAMusicMenu.setList:SetPos(10, 50)
+		GTAMusicMenu.setList:SetSize(430, 150)
+		GTAMusicMenu.setList:AddColumn("Music Set")
+		GTAMusicMenu.setList:SetMultiSelect(false)
+		GTAMusicMenu.setList.Paint = function(self, w, h)
+			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
+		end
+		GTAMusicMenu.setList.VBar.Paint = function() end
+		GTAMusicMenu.setList.VBar.btnUp.Paint = function() end
+		GTAMusicMenu.setList.VBar.btnDown.Paint = function() end
+		GTAMusicMenu.setList.VBar.btnGrip.Paint = function(self, w, h)
+			draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
+		end
+		GTAMusicMenu.setList.OnRowSelected = function(_, _, row)
+			if not row.IsHeader and row.set ~= currentSet then
+				ChangeMusicSet("next", row.set)
+				--surface.PlaySound("ui/blip.wav")
+			end
+		end
+		PopulateSetList()
+
+		-- Control buttons
+		local buttonPanel = vguiCreate("DPanel", frame)
+		buttonPanel:SetPos(10, 210)
+		buttonPanel:SetSize(430, 70)
+		buttonPanel.Paint = function(self, w, h)
+			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
+		end
+
+		local function CreateStyledButton(parent, x, y, w, h, text, cmd)
+			local btn = vguiCreate("DButton", parent)
+			btn:SetPos(x, y)
+			btn:SetSize(w, h)
+			btn:SetText(text)
+			btn:SetFont("DermaDefaultBold")
+			btn:SetTextColor(Color(255, 255, 255))
+			btn.Paint = function(self, w, h)
+				local bgColor = self:IsHovered() and Color(85, 85, 85, 255) or Color(55, 55, 55, 255)
 				draw.RoundedBox(4, 0, 0, w, h, bgColor)
 			end
-			line.Columns[1]:SetFont("DermaDefault")
-			line.Columns[1]:SetColor(Color(255, 255, 255))
-			if entry.set == currentSet then
-				selectedLine = line
+			btn.DoClick = function()
+				cmd()
+				--surface.PlaySound("ui/0x0E60F7B2.wav")
 			end
+			return btn
 		end
-	end
-	if selectedLine then
-		GTAMusicMenu.setList:SelectItem(selectedLine)
-	end
-end
+		CreateStyledButton(buttonPanel, 5, 5, 140, 30, "Random Set", function() ChangeMusicSet( "random" ) end)
+		CreateStyledButton(buttonPanel, 150, 5, 140, 30, "Random in Cat.", function() ChangeMusicSet( "same_category" ) end)
+		CreateStyledButton(buttonPanel, 295, 5, 135, 30, "Reload Data", function() frame:Close() RunConsoleCommand( "gtamusic_reload_data") RunConsoleCommand( "gtamusic_menu" ) end)
+		CreateStyledButton(buttonPanel, 5, 35, 140, 30, "Stem Controller", function() frame:Close() RunConsoleCommand("gtamusic_stemmenu") end)
+		CreateStyledButton(buttonPanel, 150, 35, 140, 30, "Randomize Stems", function() RunConsoleCommand("gtamusic_randomize_stems") end)
+		CreateStyledButton(buttonPanel, 295, 35, 135, 30, "Stop Music", function() RunConsoleCommand("gtamusic_stop") end)
 
-concommandAdd("gtamusic_menu", function()
-	if not musicSets or table.IsEmpty(musicSets) then
-		chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
-		surface.PlaySound("ui/error.wav")
-		return
-	end
-
-	local frame = vguiCreate("DFrame")
-	frame:SetSize(450, 650)
-	frame:Center()
-	frame:SetTitle("GTA Music Controller")
-	frame:SetDraggable(true)
-	frame:ShowCloseButton(true)
-	frame:MakePopup()
-	frame.Paint = function(self, w, h)
-		draw.RoundedBox(8, 0, 0, w, h, Color(25, 25, 25, 240))
-		draw.RoundedBox(8, 0, 0, w, 25, Color(45, 45, 45, 255))
-	end
-
-	-- Music set selection
-	local setLabel = vguiCreate("DLabel", frame)
-	setLabel:SetPos(10, 30)
-	setLabel:SetText("Select Music Set:")
-	setLabel:SetFont("DermaDefaultBold")
-	setLabel:SetColor(Color(255, 255, 255))
-	setLabel:SizeToContents()
-
-	GTAMusicMenu.setList = vguiCreate("DListView", frame)
-	GTAMusicMenu.setList:SetPos(10, 50)
-	GTAMusicMenu.setList:SetSize(430, 150)
-	GTAMusicMenu.setList:AddColumn("Music Set")
-	GTAMusicMenu.setList:SetMultiSelect(false)
-	GTAMusicMenu.setList.Paint = function(self, w, h)
-		draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
-	end
-	GTAMusicMenu.setList.VBar.Paint = function() end
-	GTAMusicMenu.setList.VBar.btnUp.Paint = function() end
-	GTAMusicMenu.setList.VBar.btnDown.Paint = function() end
-	GTAMusicMenu.setList.VBar.btnGrip.Paint = function(self, w, h)
-		draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
-	end
-	GTAMusicMenu.setList.OnRowSelected = function(_, _, row)
-		if not row.IsHeader and row.set ~= currentSet then
-			ChangeMusicSet("next", row.set)
-			--surface.PlaySound("ui/blip.wav")
+		-- Settings panel
+		local settingsPanel = vguiCreate("DPanel", frame)
+		settingsPanel:SetPos(10, 290)
+		settingsPanel:SetSize(430, 150)
+		settingsPanel.Paint = function(self, w, h)
+			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
-	end
-	PopulateSetList()
 
-	-- Control buttons
-	local buttonPanel = vguiCreate("DPanel", frame)
-	buttonPanel:SetPos(10, 210)
-	buttonPanel:SetSize(430, 70)
-	buttonPanel.Paint = function(self, w, h)
-		draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
-	end
+		local settingsLabel = vguiCreate("DLabel", settingsPanel)
+		settingsLabel:SetPos(5, 5)
+		settingsLabel:SetText("Settings:")
+		settingsLabel:SetFont("DermaDefaultBold")
+		settingsLabel:SetColor(Color(255, 255, 255))
+		settingsLabel:SizeToContents()
 
-	local function CreateStyledButton(parent, x, y, w, h, text, cmd)
-		local btn = vguiCreate("DButton", parent)
-		btn:SetPos(x, y)
-		btn:SetSize(w, h)
-		btn:SetText(text)
-		btn:SetFont("DermaDefaultBold")
-		btn:SetTextColor(Color(255, 255, 255))
-		btn.Paint = function(self, w, h)
-			local bgColor = self:IsHovered() and Color(85, 85, 85, 255) or Color(55, 55, 55, 255)
-			draw.RoundedBox(4, 0, 0, w, h, bgColor)
+		local volumeSlider = vguiCreate("DNumSlider", settingsPanel)
+		volumeSlider:SetPos(5, 25)
+		volumeSlider:SetSize(420, 20)
+		volumeSlider:SetText("Volume")
+		volumeSlider:SetMin(0)
+		volumeSlider:SetMax(1)
+		volumeSlider:SetDecimals(2)
+		volumeSlider:SetConVar("gtamusic_volume")
+		volumeSlider:SetValue(cvMusicVolume:GetFloat())
+
+		local fadeSlider = vguiCreate("DNumSlider", settingsPanel)
+		fadeSlider:SetPos(5, 50)
+		fadeSlider:SetSize(420, 20)
+		fadeSlider:SetText("Fade Time (s)")
+		fadeSlider:SetMin(0)
+		fadeSlider:SetMax(10)
+		fadeSlider:SetDecimals(1)
+		fadeSlider:SetConVar("gtamusic_fadetime")
+		fadeSlider:SetValue(cvFadeTime:GetFloat())
+
+		local playbackSlider = vguiCreate("DNumSlider", settingsPanel)
+		playbackSlider:SetPos(5, 75)
+		playbackSlider:SetSize(420, 20)
+		playbackSlider:SetText("Playback Rate")
+		playbackSlider:SetMin(0.5)
+		playbackSlider:SetMax(2.0)
+		playbackSlider:SetDecimals(2)
+		playbackSlider:SetConVar("gtamusic_playbackrate")
+		playbackSlider:SetValue(cvPlaybackRate:GetFloat())
+
+		local randomSetCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
+		randomSetCheck:SetPos(5, 100)
+		randomSetCheck:SetText("Random Set on Spawn")
+		randomSetCheck:SetFont("DermaDefault")
+		randomSetCheck:SetTextColor(Color(255, 255, 255))
+		randomSetCheck:SetConVar("gtamusic_randomset")
+		randomSetCheck:SizeToContents()
+
+		local randomIntensityCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
+		randomIntensityCheck:SetPos(5, 125)
+		randomIntensityCheck:SetText("Random Intensity (30-45s)")
+		randomIntensityCheck:SetFont("DermaDefault")
+		randomIntensityCheck:SetTextColor(Color(255, 255, 255))
+		randomIntensityCheck:SetConVar("gtamusic_randomize_intensity")
+		randomIntensityCheck:SizeToContents()
+
+		-- Info panel
+		local infoPanel = vguiCreate("DPanel", frame)
+		infoPanel:SetPos(10, 450)
+		infoPanel:SetSize(430, 100)
+		infoPanel.Paint = function(self, w, h)
+			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
-		btn.DoClick = function()
-			cmd()
-			--surface.PlaySound("ui/0x0E60F7B2.wav")
+
+		GTAMusicMenu.infoLabel = vguiCreate("DLabel", infoPanel)
+		GTAMusicMenu.infoLabel:SetPos(5, 5)
+		GTAMusicMenu.infoLabel:SetSize(420, 90)
+		GTAMusicMenu.infoLabel:SetWrap(true)
+		GTAMusicMenu.infoLabel:SetFont("DermaDefault")
+		GTAMusicMenu.infoLabel:SetColor(Color(255, 255, 255))
+
+		function GTAMusicMenu.UpdateInfo()
+			if not IsValid(GTAMusicMenu.infoLabel) then return end
+			local data = musicSets[currentSet] or { name = currentSet or "None", gameOrigin = "Unknown", composer = "Unknown", category = "Unknown" }
+			local intensities = musicSets[currentSet] and musicSets[currentSet].intensity or {}
+			local intensityList = table.concat(table.GetKeys(intensities), ", ")
+			GTAMusicMenu.infoLabel:SetText(
+				"Track: " .. data.name ..
+				"\nGame: " .. data.gameOrigin ..
+				"\nCategory: " .. (data.category or "Unknown") ..
+				"\nComposer: " .. data.composer ..
+				"\nIntensities: " .. (intensityList ~= "" and intensityList or "None")
+			)
 		end
-		return btn
-	end
-	CreateStyledButton(buttonPanel, 5, 5, 140, 30, "Random Set", function() ChangeMusicSet("random") end)
-	CreateStyledButton(buttonPanel, 150, 5, 140, 30, "Random in Cat.", function() ChangeMusicSet("same_category") end)
-	CreateStyledButton(buttonPanel, 295, 5, 135, 30, "Reload Data", function() RunConsoleCommand("gtamusic_reload_data") end)
-	CreateStyledButton(buttonPanel, 5, 35, 140, 30, "Stem Controller", function() frame:Close() RunConsoleCommand("gtamusic_stemmenu") end)
-	CreateStyledButton(buttonPanel, 150, 35, 140, 30, "Randomize Stems", function() RunConsoleCommand("gtamusic_randomize_stems") end)
-	CreateStyledButton(buttonPanel, 295, 35, 135, 30, "Stop Music", function() RunConsoleCommand("gtamusic_stop") end)
+		GTAMusicMenu.UpdateInfo()
 
+		-- Intensity selection
+		local intensityLabel = vguiCreate("DLabel", frame)
+		intensityLabel:SetPos(10, 560)
+		intensityLabel:SetText("Select Intensity:")
+		intensityLabel:SetFont("DermaDefaultBold")
+		intensityLabel:SetColor(Color(255, 255, 255))
+		intensityLabel:SizeToContents()
 
-	-- Settings panel
-	local settingsPanel = vguiCreate("DPanel", frame)
-	settingsPanel:SetPos(10, 290)
-	settingsPanel:SetSize(430, 150)
-	settingsPanel.Paint = function(self, w, h)
-		draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
-	end
-
-	local settingsLabel = vguiCreate("DLabel", settingsPanel)
-	settingsLabel:SetPos(5, 5)
-	settingsLabel:SetText("Settings:")
-	settingsLabel:SetFont("DermaDefaultBold")
-	settingsLabel:SetColor(Color(255, 255, 255))
-	settingsLabel:SizeToContents()
-
-	local volumeSlider = vguiCreate("DNumSlider", settingsPanel)
-	volumeSlider:SetPos(5, 25)
-	volumeSlider:SetSize(420, 20)
-	volumeSlider:SetText("Volume")
-	volumeSlider:SetMin(0)
-	volumeSlider:SetMax(1)
-	volumeSlider:SetDecimals(2)
-	volumeSlider:SetConVar("gtamusic_volume")
-	volumeSlider:SetValue(cvMusicVolume:GetFloat())
-
-	local fadeSlider = vguiCreate("DNumSlider", settingsPanel)
-	fadeSlider:SetPos(5, 50)
-	fadeSlider:SetSize(420, 20)
-	fadeSlider:SetText("Fade Time (s)")
-	fadeSlider:SetMin(0)
-	fadeSlider:SetMax(10)
-	fadeSlider:SetDecimals(1)
-	fadeSlider:SetConVar("gtamusic_fadetime")
-	fadeSlider:SetValue(cvFadeTime:GetFloat())
-
-	local playbackSlider = vguiCreate("DNumSlider", settingsPanel)
-	playbackSlider:SetPos(5, 75)
-	playbackSlider:SetSize(420, 20)
-	playbackSlider:SetText("Playback Rate")
-	playbackSlider:SetMin(0.5)
-	playbackSlider:SetMax(2.0)
-	playbackSlider:SetDecimals(2)
-	playbackSlider:SetConVar("gtamusic_playbackrate")
-	playbackSlider:SetValue(cvPlaybackRate:GetFloat())
-
-	local randomSetCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
-	randomSetCheck:SetPos(5, 100)
-	randomSetCheck:SetText("Random Set on Spawn")
-	randomSetCheck:SetFont("DermaDefault")
-	randomSetCheck:SetTextColor(Color(255, 255, 255))
-	randomSetCheck:SetConVar("gtamusic_randomset")
-	randomSetCheck:SizeToContents()
-
-	local randomIntensityCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
-	randomIntensityCheck:SetPos(5, 125)
-	randomIntensityCheck:SetText("Random Intensity (30-45s)")
-	randomIntensityCheck:SetFont("DermaDefault")
-	randomIntensityCheck:SetTextColor(Color(255, 255, 255))
-	randomIntensityCheck:SetConVar("gtamusic_randomize_intensity")
-	randomIntensityCheck:SizeToContents()
-
-	-- Info panel
-	local infoPanel = vguiCreate("DPanel", frame)
-	infoPanel:SetPos(10, 450)
-	infoPanel:SetSize(430, 100)
-	infoPanel.Paint = function(self, w, h)
-		draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
-	end
-
-	GTAMusicMenu.infoLabel = vguiCreate("DLabel", infoPanel)
-	GTAMusicMenu.infoLabel:SetPos(5, 5)
-	GTAMusicMenu.infoLabel:SetSize(420, 90)
-	GTAMusicMenu.infoLabel:SetWrap(true)
-	GTAMusicMenu.infoLabel:SetFont("DermaDefault")
-	GTAMusicMenu.infoLabel:SetColor(Color(255, 255, 255))
-
-	function GTAMusicMenu.UpdateInfo()
-		if not IsValid(GTAMusicMenu.infoLabel) then return end
-		local data = musicSets[currentSet] or { name = currentSet or "None", gameOrigin = "Unknown", composer = "Unknown", category = "Unknown" }
-		local intensities = musicSets[currentSet] and musicSets[currentSet].intensity or {}
-		local intensityList = table.concat(table.GetKeys(intensities), ", ")
-		GTAMusicMenu.infoLabel:SetText(
-			"Track: " .. data.name ..
-			"\nGame: " .. data.gameOrigin ..
-			"\nCategory: " .. (data.category or "Unknown") ..
-			"\nComposer: " .. data.composer ..
-			"\nIntensities: " .. (intensityList ~= "" and intensityList or "None")
-		)
-	end
-	GTAMusicMenu.UpdateInfo()
-
-	-- Intensity selection
-	local intensityLabel = vguiCreate("DLabel", frame)
-	intensityLabel:SetPos(10, 560)
-	intensityLabel:SetText("Select Intensity:")
-	intensityLabel:SetFont("DermaDefaultBold")
-	intensityLabel:SetColor(Color(255, 255, 255))
-	intensityLabel:SizeToContents()
-
-	GTAMusicMenu.intensityPanel = vguiCreate("DScrollPanel", frame)
-	GTAMusicMenu.intensityPanel:SetPos(10, 580)
-	GTAMusicMenu.intensityPanel:SetSize(430, 60)
-	GTAMusicMenu.intensityPanel.Paint = function(self, w, h)
-		draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
-	end
-	local scrollBar = GTAMusicMenu.intensityPanel:GetVBar()
-	scrollBar.Paint = function() end
-	scrollBar.btnUp.Paint = function() end
-	scrollBar.btnDown.Paint = function() end
-	scrollBar.btnGrip.Paint = function(self, w, h)
-		draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
-	end
-
-	GTAMusicMenu.intensityButtons = {}
-	function GTAMusicMenu.UpdateIntensityList()
-		if not IsValid(GTAMusicMenu.intensityPanel) then return end
-		for _, btn in pairs(GTAMusicMenu.intensityButtons) do
-			if IsValid(btn) then btn:Remove() end
+		GTAMusicMenu.intensityPanel = vguiCreate("DScrollPanel", frame)
+		GTAMusicMenu.intensityPanel:SetPos(10, 580)
+		GTAMusicMenu.intensityPanel:SetSize(430, 120)
+		GTAMusicMenu.intensityPanel.Paint = function(self, w, h)
+			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
-		
+		local scrollBar = GTAMusicMenu.intensityPanel:GetVBar()
+		scrollBar.Paint = function() end
+		scrollBar.btnUp.Paint = function() end
+		scrollBar.btnDown.Paint = function() end
+		scrollBar.btnGrip.Paint = function(self, w, h)
+			draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
+		end
+
 		GTAMusicMenu.intensityButtons = {}
-		
-		if musicSets[ currentSet ] and musicSets[ currentSet ].intensity then
-			local yPos = 5
-			local sortedIntensities = table.GetKeys( musicSets[ currentSet ].intensity )
-			table.sort( sortedIntensities, function( a, b ) return a < b end )
-			for _, intensity in ipairs( sortedIntensities ) do
-				GTAMusicMenu.intensityButtons[ #GTAMusicMenu.intensityButtons + 1 ] = CreateStyledButton(
-					GTAMusicMenu.intensityPanel, 5, yPos, 310, 30, intensity,
-					function() RunConsoleCommand( "gtamusic_triggerintensity", intensity ) end
-				)
-				yPos = yPos + 35
+		function GTAMusicMenu.UpdateIntensityList()
+			if not IsValid(GTAMusicMenu.intensityPanel) then return end
+			for _, btn in pairs(GTAMusicMenu.intensityButtons) do
+				if IsValid(btn) then btn:Remove() end
 			end
-			GTAMusicMenu.intensityPanel:GetCanvas():SetTall( yPos + 5 )
+			GTAMusicMenu.intensityButtons = {}
+			if musicSets[currentSet] and musicSets[currentSet].intensity then
+				-- Define the fixed order for standard intensities
+				local fixedOrder = {"low", "medium", "high", "extreme"}
+				local sortedIntensities = {}
+				-- Add standard intensities in fixed order if they exist
+				for _, intensity in ipairs(fixedOrder) do
+					if musicSets[currentSet].intensity[intensity] then
+						table.insert(sortedIntensities, intensity)
+					end
+				end
+				-- Add custom intensities alphabetically
+				local customIntensities = {}
+				for intensity in pairs(musicSets[currentSet].intensity) do
+					if not table.HasValue(fixedOrder, intensity) then
+						table.insert(customIntensities, intensity)
+					end
+				end
+				table.sort(customIntensities)
+				for _, intensity in ipairs(customIntensities) do
+					table.insert(sortedIntensities, intensity)
+				end
+				local numIntensities = #sortedIntensities
+				local maxButtonsPerRow = math.min(4, math.max(2, math.floor(430 / 100)))
+				local buttonsPerRow = math.min(maxButtonsPerRow, numIntensities)
+				local buttonWidth = math.floor(430 / buttonsPerRow) - 10
+				local buttonHeight = 30
+				local rows = math.ceil(numIntensities / buttonsPerRow)
+
+				local yPos = 5
+				for i, intensity in ipairs(sortedIntensities) do
+					local row = math.floor((i - 1) / buttonsPerRow)
+					local col = (i - 1) % buttonsPerRow
+					local xPos = 5 + col * (buttonWidth + 5)
+					GTAMusicMenu.intensityButtons[#GTAMusicMenu.intensityButtons + 1] = CreateStyledButton(
+						GTAMusicMenu.intensityPanel, xPos, yPos + row * (buttonHeight + 5), buttonWidth, buttonHeight, intensity,
+						function() RunConsoleCommand("gtamusic_triggerintensity", intensity) end
+					)
+				end
+				GTAMusicMenu.intensityPanel:GetCanvas():SetTall(yPos + rows * (buttonHeight + 5) + 5)
+			end
+			if IsValid(GTAMusicMenu.infoLabel) then
+				GTAMusicMenu.UpdateInfo()
+			end
 		end
-		if IsValid( GTAMusicMenu.infoLabel ) then
-			GTAMusicMenu.UpdateInfo()
-		end
-	end
-	GTAMusicMenu.UpdateIntensityList()
-end)
+		GTAMusicMenu.UpdateIntensityList()
+	end)
 
 	-- Stem control menu
 	concommandAdd( "gtamusic_stemmenu", function()

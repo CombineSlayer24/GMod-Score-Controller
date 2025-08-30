@@ -104,7 +104,7 @@ local musicSets = {
 		name = "ALC PB2 Pussyface",
 		gameOrigin = "Grand Theft Auto V",
 		composer = "The Alchemist",
-		path = "gta5/story/story/alc_pb2_pussyface/",
+		path = "gta5/story/alc_pb2_pussyface/",
 		stems = {
 			"ALC_PB2_PUSSYFACE_1.mp3",
 			"ALC_PB2_PUSSYFACE_2.mp3",
