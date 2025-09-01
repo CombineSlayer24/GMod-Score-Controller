@@ -70,6 +70,14 @@ local musicSets = {
 			"NRT_SONG_04_7.mp3",
 			"NRT_SONG_04_8.mp3"
 		},
+
+		intensity = {
+			low = { { 1, 2 }, { 2 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 2, 3, 7 }, { 1, 2, 3, 4, 7 } },
+			high = { { 8 }, { 6, 8 }, { 3, 6, 8 } },
+			wanted = { { 8 }, { 5, 7 } },
+			evasion = { { 1, 2, 3 }, { 1, 3 } }
+		}
 	},
 	nrt5 = {
 		name = "NRT5",
@@ -103,6 +111,53 @@ local musicSets = {
 			"NRT_SONG_06_6.mp3",
 			"NRT_SONG_06_7.mp3",
 			"NRT_SONG_06_8.mp3"
+		},
+	},
+
+	zmb_nrt_song_01 = {
+		name = "ZMB NRT 1",
+		gameOrigin = "Red Dead Redemption: Undead Nightmares",
+		composer = "Bill Elm, Woody Jackson",
+		category = "Northern",
+		path = "rdr1/dlc6/zmb_nrt_song_01",
+		stems = {
+			"ZMB_NRT_SONG_01_1.mp3",
+			"ZMB_NRT_SONG_01_2.mp3",
+			"ZMB_NRT_SONG_01_3.mp3",
+			"ZMB_NRT_SONG_01_4.mp3",
+			"ZMB_NRT_SONG_01_5.mp3",
+			"ZMB_NRT_SONG_01_7.mp3",
+			"ZMB_NRT_SONG_01_8.mp3"
+		},
+	},
+
+	tc_nrt_song_01 = {
+		name = "TC NRT 1",
+		gameOrigin = "Red Dead Redemption: Undead Nightmares",
+		composer = "Bill Elm, Woody Jackson",
+		category = "Northern",
+		path = "rdr1/dlc6/TC_NRT_SONG_01",
+		stems = {
+			"TC_NRT_SONG_01_1.mp3",
+			"TC_NRT_SONG_01_2.mp3",
+			"TC_NRT_SONG_01_3.mp3",
+			"TC_NRT_SONG_01_4.mp3",
+			"TC_NRT_SONG_01_5.mp3",
+		},
+	},
+
+	tc_nrt_song_02 = {
+		name = "TC NRT 2",
+		gameOrigin = "Red Dead Redemption: Undead Nightmares",
+		composer = "Bill Elm, Woody Jackson",
+		category = "Northern",
+		path = "rdr1/dlc6/TC_NRT_SONG_02",
+		stems = {
+			"TC_NRT_SONG_02_1.mp3",
+			"TC_NRT_SONG_02_2.mp3",
+			"TC_NRT_SONG_02_3.mp3",
+			"TC_NRT_SONG_02_4.mp3",
+			"TC_NRT_SONG_02_5.mp3",
 		},
 	},
 }

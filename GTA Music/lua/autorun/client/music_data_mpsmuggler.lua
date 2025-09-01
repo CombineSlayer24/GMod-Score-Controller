@@ -14,6 +14,13 @@ local musicSets = {
 			"SMUGGLER_INF_5.mp3",
 			"SMUGGLER_INF_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 	smuggler_track_s1 = {
@@ -30,6 +37,13 @@ local musicSets = {
 			"SMUGGLER_TRACK1_5.mp3",
 			"SMUGGLER_TRACK1_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 	smuggler_track_s2 = {
@@ -46,6 +60,13 @@ local musicSets = {
 			"SMUGGLER_TRACK2_5.mp3",
 			"SMUGGLER_TRACK2_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 	smuggler_track_s3 = {
@@ -62,6 +83,13 @@ local musicSets = {
 			"SMUGGLER_TRACK3_5.mp3",
 			"SMUGGLER_TRACK3_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 	smuggler_track_s4 = {
@@ -78,6 +106,13 @@ local musicSets = {
 			"SMUGGLER_TRACK4_5.mp3",
 			"SMUGGLER_TRACK4_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 	smuggler_track_smtb1 = {
@@ -94,6 +129,13 @@ local musicSets = {
 			"SMUGGLER_TRACK_SMTB1_5.mp3",
 			"SMUGGLER_TRACK_SMTB1_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 2, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 4 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 4 }
+		}
 	},
 
 	smuggler_track_smtb3 = {
@@ -110,6 +152,13 @@ local musicSets = {
 			"SMUGGLER_TRACK_SMTB3_5.mp3",
 			"SMUGGLER_TRACK_SMTB3_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 2, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3支4, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 4 }
+		}
 	},
 
 	smuggler_track_smtb4 = {
@@ -126,6 +175,13 @@ local musicSets = {
 			"SMUGGLER_TRACK_SMTB4_5.mp3",
 			"SMUGGLER_TRACK_SMTB4_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 5 } },
+			medium = { { 1, 2, 6 }, { 1, 5, 6 }, { 1, 4, 5 } },
+			high = { { 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 4 }
+		}
 	},
 
 	smuggler_track_smtb5 = {
@@ -142,6 +198,13 @@ local musicSets = {
 			"SMUGGLER_TRACK_SMTB5_5.mp3",
 			"SMUGGLER_TRACK_SMTB5_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 2, 5 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 5 }
+		}
 	},
 
 }

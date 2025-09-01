@@ -14,6 +14,13 @@ local musicSets = {
 			"GUNRUNNING_CS1_5.mp3",
 			"GUNRUNNING_CS1_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_cs5 = {
@@ -32,6 +39,13 @@ local musicSets = {
 			"GUNRUNNING_CS5_7.mp3",
 			"GUNRUNNING_CS5_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 2, 3, 4, 6 }, { 1, 3, 4, 5, 6 } },
+			high = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 } },
+			cooldown = { 3, 8 }
+		}
 	},
 
 	gunrunning_track_cs9 = {
@@ -46,6 +60,13 @@ local musicSets = {
 			"GUNRUNNING_CS9_3.mp3",
 			"GUNRUNNING_CS9_5.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr2 = {
@@ -62,6 +83,13 @@ local musicSets = {
 			"GUNRUNNING_GR2_5.mp3",
 			"GUNRUNNING_GR2_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr3 = {
@@ -78,6 +106,13 @@ local musicSets = {
 			"GUNRUNNING_GR3_5.mp3",
 			"GUNRUNNING_GR3_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr4 = {
@@ -94,6 +129,13 @@ local musicSets = {
 			"GUNRUNNING_GR4_5.mp3",
 			"GUNRUNNING_GR4_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr5 = {
@@ -110,6 +152,13 @@ local musicSets = {
 			"GUNRUNNING_GR5_5.mp3",
 			"GUNRUNNING_GR5_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr9 = {
@@ -126,6 +175,13 @@ local musicSets = {
 			"GUNRUNNING_GR9_5.mp3",
 			"GUNRUNNING_GR9_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr9_gen9 = {
@@ -142,6 +198,13 @@ local musicSets = {
 			"GUNRUNNING_GR9_5.mp3",
 			"GUNRUNNING_GR9_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr12 = {
@@ -158,6 +221,13 @@ local musicSets = {
 			"GUNRUNNING_GR12_5.mp3",
 			"GUNRUNNING_GR12_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr13 = {
@@ -174,6 +244,13 @@ local musicSets = {
 			"GUNRUNNING_GR13_5.mp3",
 			"GUNRUNNING_GR13_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr17 = {
@@ -190,6 +267,13 @@ local musicSets = {
 			"GUNRUNNING_GR17_5.mp3",
 			"GUNRUNNING_GR17_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
 
 	gunrunning_track_gr18 = {
@@ -206,8 +290,14 @@ local musicSets = {
 			"GUNRUNNING_GR18_5.mp3",
 			"GUNRUNNING_GR18_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+			high = { { 1, 3, 4, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { 1, 5 }
+		}
 	},
-
 }
 
 return musicSets

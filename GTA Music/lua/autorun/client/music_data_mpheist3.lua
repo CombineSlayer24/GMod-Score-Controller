@@ -16,6 +16,13 @@ local musicSets = {
 			"CASINO_HEIST_1_7.mp3",
 			"CASINO_HEIST_1_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2, 3 }, { 1, 3 }, { 1, 2 } },
+			medium = { { 1, 3, 4, 5 }, { 1, 5, 6 }, { 2, 4, 5, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 1, 4, 5, 7 } },
+			extreme = { { 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 1, 6 }
+		}
 	},
 	casino_heist_2 = {
 		name = "Casino Heist Finale",
@@ -35,10 +42,12 @@ local musicSets = {
 		},
 		intensity = {
 			low = { { 1, 2 }, { 1 } },
-			medium = { { 2, 3, 4, 5 }, {2, 3, 5, 6 } },
+			medium = { { 2, 3, 4, 5 }, { 2, 3, 5, 6 } },
 			high = { { 3, 4, 7 }, { 3, 4, 5, 6 } },
-			extreme = { { 3, 4, 5, 7}, { 3, 4, 5,  6, 7 }, { 3, 4, 5,  6, 7, 8 } }
+			extreme = { { 3, 4, 5, 7 }, { 3, 4, 5, 6, 7 }, { 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 6 }
 		}
+
 	},
 	casino_heist_4 = {
 		name = "Casino Heist Prep 4",
@@ -56,6 +65,13 @@ local musicSets = {
 			"CASINO_HEIST_4_7.mp3",
 			"CASINO_HEIST_4_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2, 3 }, { 1, 3 }, { 1, 2 } },
+			medium = { { 1, 2, 4, 5 }, { 1, 5, 6 }, { 2, 4, 5, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 1, 4, 5, 7 } },
+			extreme = { { 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 1, 6 }
+		}
 	},
 	casino_heist_8 = {
 		name = "Casino Heist Prep 8",
@@ -73,6 +89,13 @@ local musicSets = {
 			"CASINO_HEIST_8_7.mp3",
 			"CASINO_HEIST_8_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2, 3 }, { 1, 3 }, { 1, 2 } },
+			medium = { { 1, 4, 5 }, { 1, 5, 6 }, { 2, 4, 5, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 1, 4, 5, 7 } },
+			extreme = { { 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 1, 4, 6 }
+		}
 	},
 	casino_heist_the_end = {
 		name = "Casino Heist Prep The End",
@@ -90,6 +113,13 @@ local musicSets = {
 			"CASINO_THE_END_HEIST_7.mp3",
 			"CASINO_THE_END_HEIST_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2, 3 }, { 1, 3 }, { 1, 2 } },
+			medium = { { 1, 3, 4, 5 }, { 1, 5, 6 }, { 2, 4, 5, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 1, 4, 5, 7 } },
+			extreme = { { 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 1, 6 }
+		}
 	},
 }
 

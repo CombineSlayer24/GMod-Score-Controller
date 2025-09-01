@@ -14,6 +14,15 @@ local musicSets = {
 			"DLC_ASSAULT_TECH1_STEM_5.mp3",
 			"DLC_ASSAULT_TECH1_STEM_6.mp3"
 		},
+
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 2, 3, 4, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 } },
+			extreme = { 2, 3, 4, 5, 6 },
+			cooldown = { 1, 3 }
+		}
+
 	},
 	tech2 = {
 		name = "DLC Assault Tech Two",
@@ -29,6 +38,14 @@ local musicSets = {
 			"DLC_ASSAULT_TECH2_STEM_5.mp3",
 			"DLC_ASSAULT_TECH2_STEM_6.mp3"
 		},
+
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 } },
+			extreme = { 2, 3, 4, 5, 6 },
+			cooldown = { 1, 3 }
+		}
 	},
 	tech6 = {
 		name = "DLC Assault Tech Six",
@@ -44,6 +61,13 @@ local musicSets = {
 			"DLC_ASSAULT_TECH6_STEM_5.mp3",
 			"DLC_ASSAULT_TECH6_STEM_6.mp3"
 		},
+		intensity = {
+			low = { { 5 }, { 2, 5 } },
+			medium = { { 2, 3, 5 }, { 2, 3, 4, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 } },
+			extreme = { 2, 3, 4, 5, 6 },
+			cooldown = { 3, 5 }
+		}
 	},
 	tech7 = {
 		name = "DLC Assault Tech Seven",
@@ -59,6 +83,13 @@ local musicSets = {
 			"DLC_ASSAULT_TECH7_STEM_5.mp3",
 			"DLC_ASSAULT_TECH7_STEM_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 2, 3 }, { 2, 3, 4, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 } },
+			extreme = { 2, 3, 4, 5, 6 },
+			cooldown = { 1, 3 }
+		}
 	},
 }
 

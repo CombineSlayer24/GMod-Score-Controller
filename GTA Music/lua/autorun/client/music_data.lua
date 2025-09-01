@@ -22,6 +22,23 @@ local musicSets = {
 			"ALC_CAR_STEAL_1_CHIPS_1.mp3",
 			"ALC_CAR_STEAL_1_CHIPS_2.mp3",
 		},
+		intensity = {
+			medium = { { 1 } },
+			high = { { 1, 2 } }
+		}
+	},
+
+	alc_cock_song = {
+		name = "ALC Cock Song",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "The Alchemist",
+		path = "gta5/story/alc_cock_song/",
+		stems = {
+			"ALC_COCK_SONG_1.mp3",
+		},
+		intensity = {
+			high = { 1 }
+		}
 	},
 
 	alc_chop_fred_halen = {
@@ -39,6 +56,30 @@ local musicSets = {
 			"ALC_CHOP_FRED_HALEN_7.mp3",
 			"ALC_CHOP_FRED_HALEN_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 4, 6, 7 }, { 1, 2, 4, 5, 6 } },
+			high = { { 1, 2, 3, 4, 6, 7, 8 }, { 1, 2, 4, 5, 6, 7, 8 }, { 1, 2, 4, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 6, 7, 8 }, { 1, 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 2, 5, 6 }
+		}
+	},
+
+	alc_eye_in_the_sky_cars2 = {
+		name = "ALC Eye In The Sky",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "The Alchemist",
+		path = "gta5/story/alc_eye_in_the_sky_cars2/",
+		stems = {
+			"ALC_EYE_IN_THE_SKY_CARS2_1.mp3",
+			"ALC_EYE_IN_THE_SKY_CARS2_2.mp3",
+			"ALC_EYE_IN_THE_SKY_CARS2_3.mp3"
+		},
+		intensity = {
+			low = { { 1 } },
+			medium = { { 1, 2 } },
+			high = { { 1, 2 }, { 1, 2, 3 } }
+		}
 	},
 
 	alc_funk_jam = {
@@ -51,6 +92,12 @@ local musicSets = {
 			"ALC_FUNK_JAM_2.mp3",
 			"ALC_FUNK_JAM_3.mp3"
 		},
+
+		intensity = {
+			low = { { 1 } },
+			medium = { { 1, 2 } },
+			high = { { 1, 2, 3 } }
+		}
 	},
 
 	alc_funk_jam_arm2 = {
@@ -64,6 +111,14 @@ local musicSets = {
 			"ALC_FUNK_JAM_ARM2_3.mp3",
 			"ALC_FUNK_JAM_ARM2_4.mp3",
 		},
+
+		intensity = {
+			low = { { 1 } },
+			medium = { { 1, 2 } },
+			high = { { 1, 2, 3 }, { 1, 2, 3, 4 } },
+			extreme = { { 1, 2, 3, 4 } },
+			cooldown = { 2 }
+		}
 	},
 
 	alc_gun_novel = {
@@ -81,6 +136,13 @@ local musicSets = {
 			"ALC_GUN_NOVEL_7.mp3",
 			"ALC_GUN_NOVEL_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 6, 8 }, { 1, 2, 3, 6, 8 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			cooldown = { 2, 6 }
+		}
 	},
 
 	alc_pb1 = {
@@ -98,6 +160,13 @@ local musicSets = {
 			"ALC_PB1_7.mp3",
 			"ALC_PB1_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 4, 6, 7 }, { 2, 3, 4, 5, 6, 8 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7 }, { 3, 4, 5, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 2, 6 }
+		}
 	},
 
 	alc_pb2_pussyface = {
@@ -116,12 +185,22 @@ local musicSets = {
 			"ALC_PB2_PUSSYFACE_8.mp3"
 		},
 		intensity = {
-			flying = { { 1, 2 }, { 1, 6 }, { 1, 2, 6 } },
-			low = { { 1, 3, 4 } },
-			medium = { { 1, 3, 4 } },
-			high = { { 5, 6, 7, 8 } },
-			extreme = {{ 1, 4, 7, 8 } }
+			flying = { { 1, 6 }, { 1, 2, 4, 6 }, { 1, 2, 3, 4, 6 }, { 1, 3, 4, 6 } },
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6 }, { 2, 3, 4, 5, 6, 8 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 3, 6 }
 		}
+	},
+
+	alc_wavery = {
+		name = "ALC Wavery",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "The Alchemist",
+		path = "gta5/story/alc_wavery/",
+		stems = { "alc_wavery_1.mp3"},
+		intensity = { high = { { 1 } } }
 	},
 
 	alc_vodka = {
@@ -139,6 +218,13 @@ local musicSets = {
 			"ALC_VODKA_7.mp3",
 			"ALC_VODKA_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 2, 4, 5, 6, 7 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 5, 8 }
+		}
 	},
 
 	ba_metz_debunked = {
@@ -156,6 +242,13 @@ local musicSets = {
 			"BA_METZ_DEBUNKED_7.mp3",
 			"BA_METZ_DEBUNKED_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 6, 7 }, { 1, 2, 3, 4, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7 } },
+			cooldown = { 2, 6 }
+		}
 	},
 
 	ba_metz_love_eggs = {
@@ -174,7 +267,12 @@ local musicSets = {
 			"BA_METZ_LOVE_EGGS_8.mp3",
 		},
 		intensity = {
-			cooldown = { { 2, 3 }, { 1, 3} },
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 8 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6, 8 }, { 1, 2, 3, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 1, 4, 5, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 1, 2, 3, 4, 6, 7, 8 } },
+
+			cooldown = { 1, 2, 5, 8 },
 			★★★ = { { 2, 5 }, { 2, 8, 5 }, { 5, 8 } },
 			★★★★ = { { 2, 3, 6 }, { 3, 5, 8 }, {5, 6, 8 } },
 			★★★★★ = {{ 2, 4, 5, 6 }, { 5, 7, 8 }, {3, 5, 7, 8} }
@@ -195,6 +293,11 @@ local musicSets = {
 			"BA_TBONER_6.mp3",
 			"BA_TBONER_7.mp3",
 			"BA_TBONER_8.mp3",
+		},
+
+		intensity = {
+			intro = { 1, 3, 6 },
+			rampage = { { 3, 4, 6, 7 }, { 4, 5, 6, 7 }, { 3, 4, 5, 6, 7, 8 } },
 		},
 	},
 
@@ -254,6 +357,17 @@ local musicSets = {
 			"RG15_7.mp3",
 			"RG15_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 3, 4, 5, 6 }, { 2, 3, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 3, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 } },
+			
+			cooldown = { 2, 3 },
+			★★★ = { { 2, 5 }, { 2, 5, 8 }, { 5, 6, 8 }, { 2, 6 }, { 2, 3, 6 } },
+			★★★★ = { { 2, 3, 6 }, { 2, 3, 6, 7, 8 }, { 5, 6, 8 }, { 6, 7, 8 }, { 5 , 6 } },
+			★★★★★ = { { 3, 5, 6, 7 }, { 2, 4, 5, 6 }, { 6, 7, 8 }, { 3, 6, 7 }, { 4, 5, 6, 7 } }
+		}
 	},
 
 	td_burning_bar = {
@@ -271,6 +385,14 @@ local musicSets = {
 			"TD_BURNING_BAR_7.mp3",
 			"TD_BURNING_BAR_8.mp3"
 		},
+
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 3, 4, 5, 6 }, { 2, 3, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 3, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 3 },
+		}
 	},
 
 	td_beyond = {
@@ -284,6 +406,14 @@ local musicSets = {
 			"TD_BEYOND_3.mp3",
 			"TD_BEYOND_4.mp3"
 		},
+
+		intensity = {
+			low = { 1 },
+			medium = { { 1, 3,}, { 1, 2, 3 } },
+			high = { { 1, 3, 4 }, { 3, 4 } },
+			extreme = { 1, 2, 3, 4 },
+			cooldown = { 1, 3 },
+		}
 	},
 
 	td_city = {
@@ -301,6 +431,14 @@ local musicSets = {
 			"TD_CITY_7.mp3",
 			"TD_CITY_8.mp3",
 		},
+
+		intensity = {
+			low = {  { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 4, 6, 7 }, { 2, 3, 4, 5, 6, 8 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 4, 6, 7 } },
+			extreme = { 1, 3, 4, 5, 6, 7, 8 },
+			cooldown = { 2, 5, 6, 8 }
+		}
 	},
 
 	td_dark_robbery = {
@@ -318,6 +456,14 @@ local musicSets = {
 			"TD_DARK_ROBBERY_7.mp3",
 			"TD_DARK_ROBBERY_8.mp3",
 		},
+
+		intensity = {
+			low = {  { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 3,  4, 6, 7 }, { 2, 3, 4, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 4, 5, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 3, 6, 8 }
+		}
 	},
 
 	td_diamond_diary_fake = {
@@ -335,6 +481,14 @@ local musicSets = {
 			"TD_DIAMOND_DIARY_FAKE_7.mp3",
 			"TD_DIAMOND_DIARY_FAKE_8.mp3",
 		},
+
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 3, 8 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 4, 6, 7, 8 }, { 2, 3, 4, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 6, 7, 8 }, { 2, 4, 6, 7, 8 } },
+			extreme = { { 2, 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			cooldown = { 2, 6, 8 }
+		}
 	},
 
 	td_dr_destructo_fake = {
@@ -352,6 +506,13 @@ local musicSets = {
 			"TD_DESTRUCTO_7.mp3",
 			"TD_DESTRUCTO_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 2, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 3, 4, 6, 7 }, { 2, 3, 4, 5, 6 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 3, 6 }
+		}
 	},
 
 	td_dragoner = {
@@ -369,6 +530,14 @@ local musicSets = {
 			"TD_DRAGONER_7.mp3",
 			"TD_DRAGONER_8.mp3",
 		},
+
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 4, 6, 7, 8 }, { 2, 3, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			cooldown = { 2, 3, 6 }
+		}
 	},
 
 	td_greyhound = {
@@ -403,6 +572,13 @@ local musicSets = {
 			"td_scrap_yard_7.mp3",
 			"td_scrap_yard_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 3 }, { 1, 2, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 2, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 2, 6 }
+		}
 	},
 
 	td_streets_of_fortune = {
@@ -420,6 +596,13 @@ local musicSets = {
 			"TD_STREETS_OF_FORTUNE_7.mp3",
 			"TD_STREETS_OF_FORTUNE_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 3 }, { 1, 3, 6 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 2, 3, 4, 6 }, { 1, 3, 5, 6, 8 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 6 }
+		}
 	},
 
 	td_universal = {
@@ -455,12 +638,12 @@ local musicSets = {
 			"TD_VACUUM_8.mp3",
 		},
 		intensity = {
-			low = { { 1, 2 }, { 1, 2, 3 }, { 2, 6 } },
-			medium = { { 2, 3, 4, 6 }, { 2, 3, 4, 6, 8 }, { 2, 3, 5, 6 } },
+			low = { { 1, 2 }, { 1, 2, 3 }, { 2 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 2, 3, 4, 6, 8 }, { 2, 3, 5, 6 } },
 			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6 }, { 2, 3, 4, 6, 7, 8 } },
-			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 1, 2, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			cooldown = { { 1, 3, 8 } },
 
-			cooldown = { { 2, 3 } },
 			★★★ = { { 2, 5 }, { 2, 5, 8 }, { 5, 6, 8 }, { 2, 6 }, { 2, 3, 6 } },
 			★★★★ = { { 2, 3, 6 }, { 2, 3, 6, 7, 8 }, { 5, 6, 8 }, { 6, 7, 8 }, { 5 , 6 } },
 			★★★★★ = { { 3, 5, 6, 7 }, { 2, 4, 5, 6 }, { 6, 7, 8 }, { 3, 6, 7 }, { 4, 5, 6, 7 } }
@@ -482,6 +665,13 @@ local musicSets = {
 			"WDY_CROCODILE_TEARS_7.mp3",
 			"WDY_CROCODILE_TEARS_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7 }, { } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 4, 5, 6, 7, 8 }, { } },
+			cooldown = { 5, 6 }
+		}
 	},
 
 	wdy_meaty = {
@@ -499,6 +689,13 @@ local musicSets = {
 			"WDY_MEATY_7.mp3",
 			"WDY_MEATY_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 6, 8 }, { 1, 2, 3, 5, 6, 8 }, { 1, 2, 3, 5, 6 } },
+			high = { { 2, 3, 6, 7, 8 }, { 2, 3, 5, 6, 7, 8 }, { 1, 3, 6, 7 } },
+			extreme = { { 2, 3, 5, 6, 7, 8 } },
+			cooldown = { 1, 3, 7 }
+		}
 	},
 
 	wdy_mission_seven = {
@@ -516,6 +713,13 @@ local musicSets = {
 			"WDY_MISSION_SEVEN_7.mp3",
 			"WDY_MISSION_SEVEN_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4 }, { 1, 3, 4, 8 }, { 1, 3, 4, 5, 6 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 3, 4 }
+		}
 	},
 
 	wdy_nine_blurt = {
@@ -533,6 +737,13 @@ local musicSets = {
 			"WDY_NINE_BLURT_7.mp3",
 			"WDY_NINE_BLURT_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 6, 7 }, { 1, 2, 4, 5, 6 } },
+			high = { { 2, 4, 6, 7 }, { 2, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7 }, { 2, 4, 5, 6, 7, 8 } },
+			cooldown = { 4, 5 }
+		}
 	},
 
 	wdy_rh_bulldozer = {
@@ -545,6 +756,11 @@ local musicSets = {
 			"WDY_RH_BULLDOZER_2.mp3",
 			"WDY_RH_BULLDOZER_3.mp3",
 		},
+		intensity = {
+			low = { { 1 } },
+			medium = { { 1, 2 } },
+			high = { { 1, 2, 3 } }
+		}
 	},
 
 	wdy_sapstick = {
@@ -561,6 +777,13 @@ local musicSets = {
 			"WDY_SAPSTICK_7.mp3",
 			"WDY_SAPSTICK_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 3, 4, 6, 8 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 4, 8 }
+		}
 	},
 
 	wdy_silver_pussy = {
@@ -578,6 +801,13 @@ local musicSets = {
 			"WDY_SILVER_PUSSY_7.mp3",
 			"WDY_SILVER_PUSSY_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 3, 4, 6, 8 }, { 1, 2, 3, 5, 6 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 } },
+			cooldown = { 1, 4 }
+		}
 	},
 
 	wdy_sticky_vicky = {
@@ -595,6 +825,13 @@ local musicSets = {
 			"WDY_STICKY_VICKY_7.mp3",
 			"WDY_STICKY_VICKY_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6, 8 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 3, 4 }
+		}
 	},
 
 	wdy_track_8 = {
@@ -612,6 +849,13 @@ local musicSets = {
 			"WDY_TRACK_8_7.mp3",
 			"WDY_TRACK_8_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 2, 3, 5, 6 }, { 1, 3, 4, 6, 8 } },
+			high = { { 3, 4, 5, 6 }, { 3, 6, 7, 8 } },
+			extreme = { { 2, 3, 5, 6, 7 }, { 2, 3, 6, 7, 8 } },
+			cooldown = { 2, 5, 6 }
+		}
 	},
 
 	wdy_vinegar_tits = {
@@ -629,49 +873,13 @@ local musicSets = {
 			"WDY_VINEGAR_TITS_7.mp3",
 			"WDY_VINEGAR_TITS_8.mp3",
 		},
-	},
-
-	biker_strings = {
-		name = "Biker Strings",
-		gameOrigin = "GTA: Online (Bikers)",
-		composer = "James Curd",
-		path = "gta5/mpbiker/biker_strings",
-		stems = {
-			"BIKER_STRINGS_STEM_1.mp3",
-			"BIKER_STRINGS_STEM_2.mp3",
-			"BIKER_STRINGS_STEM_3.mp3",
-			"BIKER_STRINGS_STEM_4.mp3",
-			"BIKER_STRINGS_STEM_5.mp3",
-			"BIKER_STRINGS_STEM_6.mp3"
-		},
-	},
-	biker_idea_7 = {
-		name = "Biker Idea 7",
-		gameOrigin = "GTA: Online (Bikers)",
-		composer = "Holy Fuck",
-		path = "gta5/mpbiker/biker_idea_7",
-		stems = {
-			"BIKER_IDEA_7_STEM_1.mp3",
-			"BIKER_IDEA_7_STEM_2.mp3",
-			"BIKER_IDEA_7_STEM_3.mp3",
-			"BIKER_IDEA_7_STEM_4.mp3",
-			"BIKER_IDEA_7_STEM_5.mp3",
-			"BIKER_IDEA_7_STEM_6.mp3"
-		},
-	},
-	biker_idea_8 = {
-		name = "Biker Idea 8",
-		gameOrigin = "GTA: Online (Bikers)",
-		composer = "Holy Fuck",
-		path = "gta5/mpbiker/biker_idea_8",
-		stems = {
-			"BIKER_IDEA_8_STEM_1.mp3",
-			"BIKER_IDEA_8_STEM_2.mp3",
-			"BIKER_IDEA_8_STEM_3.mp3",
-			"BIKER_IDEA_8_STEM_4.mp3",
-			"BIKER_IDEA_8_STEM_5.mp3",
-			"BIKER_IDEA_8_STEM_6.mp3"
-		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6, 8 } },
+			high = { { 1, 3, 6, 7 }, { 1, 3, 5, 6, 7 }, { 1, 2, 6, 7 } },
+			extreme = { { 1, 3, 5, 6, 7 }, { 1, 2, 3, 5, 6, 7 } },
+			cooldown = { 1, 4 }
+		}
 	},
 }
 

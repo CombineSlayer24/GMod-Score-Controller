@@ -155,6 +155,13 @@ local musicSets = {
 			"NY_BAR_SONG_02_5.mp3",
 			"NY_BAR_SONG_02_6.mp3"
 		},
+
+		intensity = {
+			low = { { 1 }, { 1, 3 }, { 3, 6 }, { 6 } },
+			medium = { { 1, 2, }, { 2, 3, }, { 2, 3, 6 }, { 2, 3, 6 } },
+			high = { { 1, 3, 5 }, { 3, 5, 6 }, { 3, 5 }, { 1, 5 }, { 5 }, { 5, 6 } },
+			extreme = { { 1, 4 }, { 4, 6 }, { 3, 4, 6 }, { 4 } },
+		}
 	},
 
 	office_action_song_02 = {

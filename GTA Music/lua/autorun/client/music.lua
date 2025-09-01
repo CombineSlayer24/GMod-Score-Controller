@@ -27,7 +27,7 @@ local cvFadeTime = CreateClientConVar( "gtamusic_fadetime", "2.0", true, false, 
 local cvPlaybackRate = CreateClientConVar( "gtamusic_playbackrate", "1.0", true, false, "Playback speed multiplier", 0.5, 2 )
 local cvDebug = CreateClientConVar( "gtamusic_debug", "0", true, false, "Enable debug prints and HUD (1=on)" )
 local cvMusicSet = CreateClientConVar( "gtamusic_setname", "alc_vodka", true, false, "Music set to play (alc_vodka, alc_pb2_pussyface, nrt4, nybar, cemetery, td_vacuum)" )
-local cvRandomIntensity = CreateClientConVar( "gtamusic_randomize_intensity", "0", true, false, "Randomly switch intensity combinations every 30-45 seconds." )
+local cvRandomIntensity = CreateClientConVar( "gtamusic_intensitysequences", "0", true, false, "Randomly switch intensity sequences every 30 seconds." )
 local cvRandomSet = CreateClientConVar( "gtamusic_randomset", "1", true, false, "Randomize music set on spawn (1=on)" )
 
 -- Lua shortcuts
@@ -293,6 +293,7 @@ end
 local comboIndex = {}
 
 -- Trigger stems by intensity level
+-- Trigger stems by intensity level
 local function TriggerIntensity( intensity )
     local maxStems = musicSets[currentSet] and #musicSets[currentSet].stems or MAX_STEMS
     local intensityCombos = musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[intensity]
@@ -303,22 +304,27 @@ local function TriggerIntensity( intensity )
 
     -- Initialize combo index for the current set and intensity
     comboIndex[currentSet] = comboIndex[currentSet] or {}
-    comboIndex[currentSet][intensity] = comboIndex[currentSet][intensity] or 0
+    -- Reset sequence to 1 if intensity has changed
+    if currentIntensity ~= intensity then
+        comboIndex[currentSet][intensity] = 1
+    else
+        -- Increment sequence index only if random intensity is enabled and staying on the same intensity
+        if cvRandomIntensity:GetBool() and type(intensityCombos[1]) == "table" then
+            comboIndex[currentSet][intensity] = ((comboIndex[currentSet][intensity] or 0) % #intensityCombos) + 1
+        else
+            comboIndex[currentSet][intensity] = comboIndex[currentSet][intensity] or 1
+        end
+    end
 
     local selectedCombo
     if type(intensityCombos[1]) == "table" then
-        -- Multiple combinations: select randomly if manual, sequentially if random intensity enabled
-        if cvRandomIntensity:GetBool() then
-            comboIndex[currentSet][intensity] = (comboIndex[currentSet][intensity] % #intensityCombos) + 1
-            selectedCombo = intensityCombos[comboIndex[currentSet][intensity]]
-            DebugPrint("Sequential combo for intensity:", intensity, "| Combo index:", comboIndex[currentSet][intensity], "| Stems:", tableConcat(selectedCombo, ", "))
-        else
-            selectedCombo = intensityCombos[mathRandom(1, #intensityCombos)]
-            DebugPrint("Random combo for intensity:", intensity, "| Stems:", tableConcat(selectedCombo, ", "))
-        end
+        -- Multiple combinations: use the current sequence index
+        selectedCombo = intensityCombos[comboIndex[currentSet][intensity]]
+        DebugPrint("Selected combo for intensity:", intensity, "| Sequence:", comboIndex[currentSet][intensity], "| Stems:", tableConcat(selectedCombo, ", "))
     else
         -- Single combination
         selectedCombo = intensityCombos
+        comboIndex[currentSet][intensity] = 1 -- Always sequence 1 for single combos
         DebugPrint("Single combo for intensity:", intensity, "| Stems:", tableConcat(selectedCombo, ", "))
     end
 
@@ -348,7 +354,6 @@ local function TriggerIntensity( intensity )
     end
     DebugPrint("Triggered intensity:", intensity, "| Selected combination:", tableConcat(selectedCombo, ", "))
 end
-
 
 
 -- Randomize stems
@@ -602,103 +607,108 @@ if CLIENT then
 		end)
 	end)
 
-	hook.Add( "HUDPaint", "GTAMusic_DebugHUD", function()
-		if not cvDebug:GetBool() then return end
+hook.Add( "HUDPaint", "GTAMusic_DebugHUD", function()
+    if not cvDebug:GetBool() then return end
 
-		local lines = {}
-		local setName = musicSets[ currentSet ] and musicSets[ currentSet ].name or currentSet
-		local activeStems = {}
-		local stemCount = musicSets[ currentSet ] and #musicSets[ currentSet ].stems or MAX_STEMS
-		for i = 1, stemCount do
-			if stemStates[ i ] then
-				table.insert( activeStems, i )
-			end
-		end
-		table.insert( lines, "Set: " .. setName )
-		table.insert( lines, "Active Stems: " .. ( next( activeStems ) and table.concat( activeStems, ", " ) or "None" ) )
+    local lines = {}
+    local setName = musicSets[currentSet] and musicSets[currentSet].name or currentSet
+    local activeStems = {}
+    local stemCount = musicSets[currentSet] and #musicSets[currentSet].stems or MAX_STEMS
+    for i = 1, stemCount do
+        if stemStates[i] then
+            table.insert(activeStems, i)
+        end
+    end
+    table.insert(lines, "Set: " .. setName)
+    table.insert(lines, "Active Stems: " .. (next(activeStems) and table.concat(activeStems, ", ") or "None"))
 
-		-- Handle intensity with flashing stars
-		local intensityText = "Intensity: "
-		if currentIntensity then
-			intensityText = intensityText .. currentIntensity
-			local stars = currentIntensity:gsub("[^★]", "") -- Extract all ★ characters
-			if stars and #stars > 0 then
-				intensityText = "Intensity: " .. stars -- Use the full star sequence
-			end
-			table.insert( lines, intensityText )
-			print("Debug: currentIntensity =", currentIntensity, "Stars =", stars, "Star count =", #stars) -- Debug output
-		else
-			table.insert( lines, "Intensity: None" )
-		end
+    -- Handle intensity with flashing stars
+    local intensityText = "Intensity: "
+    if currentIntensity then
+        intensityText = intensityText .. currentIntensity
+        local stars = currentIntensity:gsub("[^★]", "") -- Extract all ★ characters
+        if stars and #stars > 0 then
+            intensityText = "Intensity: " .. stars -- Use the full star sequence
+        end
+        table.insert(lines, intensityText)
+        print("Debug: currentIntensity =", currentIntensity, "Stars =", stars, "Star count =", #stars) -- Debug output
+        -- Add sequence number if intensity has multiple combinations
+        if musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[currentIntensity] and type(musicSets[currentSet].intensity[currentIntensity][1]) == "table" then
+            local sequenceIndex = comboIndex[currentSet] and comboIndex[currentSet][currentIntensity] or 1
+            table.insert(lines, "Sequence: " .. sequenceIndex)
+        end
+    else
+        table.insert(lines, "Intensity: None")
+    end
 
-		if cvRandomIntensity:GetBool() and musicSets[ currentSet ] and musicSets[ currentSet ].intensity and nextIntensityTime > 0 then
-			local timeLeft = math.max( 0, math.floor( nextIntensityTime - CurTime() ) )
-			table.insert( lines, "Next Intensity Cycle: " .. timeLeft .. "s" )
-		end
+    if cvRandomIntensity:GetBool() and musicSets[currentSet] and musicSets[currentSet].intensity and nextIntensityTime > 0 then
+        local timeLeft = math.max(0, math.floor(nextIntensityTime - CurTime()))
+        table.insert(lines, "Next Intensity Cycle: " .. timeLeft .. "s")
+    end
 
-		surface.SetFont( "DermaLarge" )
-		local maxWidth = 0
-		local heights = {}
-		for i, line in ipairs( lines ) do
-			local w, h = surface.GetTextSize( line )
-			maxWidth = math.max( maxWidth, w )
-			heights[ i ] = h
-		end
-		local totalHeight = #lines * 30 + 10
-		local x = 25
-		local y = ScrH() / 2 - totalHeight / 2
+    surface.SetFont("DermaLarge")
+    local maxWidth = 0
+    local heights = {}
+    for i, line in ipairs(lines) do
+        local w, h = surface.GetTextSize(line)
+        maxWidth = math.max(maxWidth, w)
+        heights[i] = h
+    end
+    local totalHeight = #lines * 30 + 10
+    local x = 25
+    local y = ScrH() / 2 - totalHeight / 2
 
-		-- Draw background box
-		local boxWidth = math.min( maxWidth + 20, ScrW() - 20 )
-		draw.RoundedBox( 8, x, y - 10, boxWidth, totalHeight + 20, Color( 0, 0, 0, 180 ) )
+    -- Draw background box
+    local boxWidth = math.min(maxWidth + 20, ScrW() - 20)
+    draw.RoundedBox(8, x, y - 10, boxWidth, totalHeight + 20, Color(0, 0, 0, 180))
 
-		-- Draw text with shadow and flashing stars
-		for i, line in ipairs( lines ) do
-			local textY = y + ( i - 1 ) * 30
-			if line:find("Intensity:") and currentIntensity and currentIntensity:gsub("[^★]", "") ~= "" then
-				local fullText = line
-				local baseText = "Intensity: "
-				local stars = currentIntensity:gsub("[^★]", "") -- Get all ★ characters
-				local fullWidth = surface.GetTextSize(fullText)
-				local baseWidth = surface.GetTextSize(baseText)
-				local starWidth = surface.GetTextSize(stars)
-				-- Center the entire line
-				local centerX = x + ( boxWidth / 2 )
-				-- Draw base text
-				draw.SimpleText( baseText, "DermaLarge", centerX - ( fullWidth / 2 ), textY + 2, Color( 0, 0, 0, 200 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-				draw.SimpleText( baseText, "DermaLarge", centerX - ( fullWidth / 2 ), textY, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-				-- Draw flashing stars, positioned after base text
-				local time = CurTime()
-				local cycleSpeed = 2.5 -- Adjust for faster/slower flashing
-				local phase = (time * cycleSpeed) % 3 -- Cycle through 0 to 3
-				local r, b, w = 0, 0, 0
+    -- Draw text with shadow and flashing stars
+    for i, line in ipairs(lines) do
+        local textY = y + (i - 1) * 30
+        if line:find("Intensity:") and currentIntensity and currentIntensity:gsub("[^★]", "") ~= "" then
+            local fullText = line
+            local baseText = "Intensity: "
+            local stars = currentIntensity:gsub("[^★]", "") -- Get all ★ characters
+            local fullWidth = surface.GetTextSize(fullText)
+            local baseWidth = surface.GetTextSize(baseText)
+            local starWidth = surface.GetTextSize(stars)
+            -- Center the entire line
+            local centerX = x + (boxWidth / 2)
+            -- Draw base text
+            draw.SimpleText(baseText, "DermaLarge", centerX - (fullWidth / 2), textY + 2, Color(0, 0, 0, 200), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+            draw.SimpleText(baseText, "DermaLarge", centerX - (fullWidth / 2), textY, Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+            -- Draw flashing stars, positioned after base text
+            local time = CurTime()
+            local cycleSpeed = 2.5 -- Adjust for faster/slower flashing
+            local phase = (time * cycleSpeed) % 3 -- Cycle through 0 to 3
+            local r, b, w = 0, 0, 0
 
-				-- Define color phases: 0-1 (Red), 1-2 (Blue), 2-3 (White)
-				if phase < 1 then
-					r = math.floor(255 * (1 - phase)) -- Fade out red
-				elseif phase < 2 then
-					b = math.floor(255 * (phase - 1)) -- Fade in blue
-				else
-					w = math.floor(255 * (phase - 2)) -- Fade in white (R=G=B for white)
-				end
+            -- Define color phases: 0-1 (Red), 1-2 (Blue), 2-3 (White)
+            if phase < 1 then
+                r = math.floor(255 * (1 - phase)) -- Fade out red
+            elseif phase < 2 then
+                b = math.floor(255 * (phase - 1)) -- Fade in blue
+            else
+                w = math.floor(255 * (phase - 2)) -- Fade in white (R=G=B for white)
+            end
 
-				-- Set flash color: white requires R, G, B all set to the same value
-				local flashColor = Color(
-					math.max(r, w), -- Red or white contribution
-					w,             -- Green for white
-					math.max(b, w), -- Blue or white contribution
-					255
-				)
+            -- Set flash color: white requires R, G, B all set to the same value
+            local flashColor = Color(
+                math.max(r, w), -- Red or white contribution
+                w,             -- Green for white
+                math.max(b, w), -- Blue or white contribution
+                255
+            )
 
-				local starX = centerX - ( fullWidth / 2 ) + baseWidth
-				draw.SimpleText( stars, "DermaLarge", starX, textY + 2, Color( 0, 0, 0, 200 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP ) -- Shadow
-				draw.SimpleText( stars, "DermaLarge", starX, textY, flashColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP ) -- Stars
-			else
-				draw.SimpleText( line, "DermaLarge", x + ( boxWidth / 2 ), textY + 2, Color( 0, 0, 0, 200 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-				draw.SimpleText( line, "DermaLarge", x + ( boxWidth / 2 ), textY, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-			end
-		end
-	end )
+            local starX = centerX - (fullWidth / 2) + baseWidth
+            draw.SimpleText(stars, "DermaLarge", starX, textY + 2, Color(0, 0, 0, 200), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP) -- Shadow
+            draw.SimpleText(stars, "DermaLarge", starX, textY, flashColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP) -- Stars
+        else
+            draw.SimpleText(line, "DermaLarge", x + (boxWidth / 2), textY + 2, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+            draw.SimpleText(line, "DermaLarge", x + (boxWidth / 2), textY, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        end
+    end
+end)
 
 --[[ 	hookAdd( "HUDPaint", "GTAMusic_DebugHUD", function()
 			if not cvDebug:GetBool() then return end
@@ -980,10 +990,10 @@ if CLIENT then
 
 		local randomIntensityCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
 		randomIntensityCheck:SetPos(5, 125)
-		randomIntensityCheck:SetText("Random Intensity (30-45s)")
+		randomIntensityCheck:SetText("Enable Intensity Changing Sequences")
 		randomIntensityCheck:SetFont("DermaDefault")
 		randomIntensityCheck:SetTextColor(Color(255, 255, 255))
-		randomIntensityCheck:SetConVar("gtamusic_randomize_intensity")
+		randomIntensityCheck:SetConVar("gtamusic_intensitysequences")
 		randomIntensityCheck:SizeToContents()
 
 		-- Info panel
