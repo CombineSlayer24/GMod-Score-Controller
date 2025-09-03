@@ -359,7 +359,7 @@ end
 -- Randomize stems
 local function RandomizeStems()
 	local stemCount = musicSets[ currentSet ] and #musicSets[ currentSet ].stems or MAX_STEMS
-	local numStemsToEnable = mathRandom( 2, math.min( 4, stemCount ) )
+	local numStemsToEnable = mathRandom(1, stemCount)
 	local availableStems = {}
 	for i = 1, stemCount do
 		tableInsert( availableStems, i )

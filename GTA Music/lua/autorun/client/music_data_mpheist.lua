@@ -16,6 +16,14 @@ local musicSets = {
 			"MPHEIST_TRACK1_7.mp3",
 			"MPHEIST_TRACK1_8.mp3",
 		},
+
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 1, 2, 3, 5, 6 }, { 1, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 3, 6, 7, 8 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 6, 7, 8 } },
+			cooldown = { 6, 8 }
+		}
 	},
 
 	mpheist_track2 = {
@@ -34,6 +42,13 @@ local musicSets = {
 			"MPHEIST_TRACK2_7.mp3",
 			"MPHEIST_TRACK2_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 2, 3, 5, 6, 8 }, { 1, 2, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 3, 6, 7, 8 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 6, 8 }
+		}
 	},
 
 	mpheist_track3 = {
@@ -52,6 +67,13 @@ local musicSets = {
 			"MPHEIST_TRACK3_7.mp3",
 			"MPHEIST_TRACK3_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 2, 3, 5, 6, 8 }, { 1, 3, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 3, 6, 7, 8 }, { 1, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7 } },
+			cooldown = { 5, 6 }
+		}
 	},
 
 	mpheist_track4 = {
@@ -70,6 +92,13 @@ local musicSets = {
 			"MPHEIST_TRACK4_7.mp3",
 			"MPHEIST_TRACK4_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 3, 5, 6, 8 }, { 1, 3, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 3, 4, 5, 6, 7 }, { 3, 6, 7, 8 }, { 1, 3, 4, 6, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
+			cooldown = { 6, 8 }
+		}
 	},
 
 	mpheist_track5 = {
@@ -88,24 +117,13 @@ local musicSets = {
 			"MPHEIST_TRACK5_7.mp3",
 			"MPHEIST_TRACK5_8.mp3",
 		},
-	},
-
-	mpheist_track6 = {
-		name = "Heists Track 6",
-		gameOrigin = "GTA: Online",
-		composer = "Tangerine Dream, Woody Jackson",
-		category = "Original Heists",
-		path = "gta5/mpheist/mpheist_track_6",
-		stems = {
-			"MPHEIST_TRACK6_1.mp3",
-			"MPHEIST_TRACK6_2.mp3",
-			"MPHEIST_TRACK6_3.mp3",
-			"MPHEIST_TRACK6_4.mp3",
-			"MPHEIST_TRACK6_5.mp3",
-			"MPHEIST_TRACK6_6.mp3",
-			"MPHEIST_TRACK6_7.mp3",
-			"MPHEIST_TRACK6_8.mp3",
-		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 2, 3, 5, 6, 8 }, { 1, 2, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 3, 4, 5, 6, 7 }, { 2, 3, 6, 7, 8 }, { 1, 2, 3, 4, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 6, 7 } },
+			cooldown = { 6, 8 }
+		}
 	},
 
 	mpheist_track7 = {
@@ -124,6 +142,13 @@ local musicSets = {
 			"MPHEIST_TRACK7_7.mp3",
 			"MPHEIST_TRACK7_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 2, 3, 5, 6, 8 }, { 1, 2, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 3, 6, 7, 8 }, { 1, 3, 4, 7, 8 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7 }, { 3, 4, 6, 7, 8 } },
+			cooldown = { 6, 8 }
+		}
 	},
 
 	mpheist_track8 = {
@@ -142,6 +167,14 @@ local musicSets = {
 			"MPHEIST_TRACK8_7.mp3",
 			"MPHEIST_TRACK8_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 3 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 4, 5, 6 }, { 2, 3, 5, 6, 8 }, { 1, 2, 4 } },
+			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 4, 5, 6, 7, 8 }, { 2, 5, 6, 7 }, { 1, 2, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 2, 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7 }, { 2, 4, 5, 6, 7 } },
+			cooldown = { 6, 8 },
+			heist_failed = { 1, 2 }
+		}
 	},
 }
 

@@ -4,6 +4,7 @@ local musicSets = {
 		name = "PowerPlay Bespoke",
 		gameOrigin = "GTA: Online",
 		composer = "James Curd, Lee Thompson",
+		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_bespoke",
 		stems = {
 			"DLC_BATTLE_POWERPLAY_BESPOKE_1.mp3",

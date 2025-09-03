@@ -7,14 +7,14 @@ local musicSets = {
 		category = "Cayo Perico Heist",
 		path = "gta5/mpheist4/hei4_prep_track_a02",
 		stems = {
-			"HEI4_PREP_A02_1.mp3",
-			"HEI4_PREP_A02_2.mp3",
-			"HEI4_PREP_A02_3.mp3",
-			"HEI4_PREP_A02_4.mp3",
-			"HEI4_PREP_A02_5.mp3",
-			"HEI4_PREP_A02_6.mp3",
-			"HEI4_PREP_A02_7.mp3",
-			"HEI4_PREP_A02_8.mp3"
+			"HEI4_PREP_TRACK_A02_1.mp3",
+			"HEI4_PREP_TRACK_A02_2.mp3",
+			"HEI4_PREP_TRACK_A02_3.mp3",
+			"HEI4_PREP_TRACK_A02_4.mp3",
+			"HEI4_PREP_TRACK_A02_5.mp3",
+			"HEI4_PREP_TRACK_A02_6.mp3",
+			"HEI4_PREP_TRACK_A02_7.mp3",
+			"HEI4_PREP_TRACK_A02_8.mp3"
 		},
 	},
 
