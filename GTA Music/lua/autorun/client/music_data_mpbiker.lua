@@ -237,12 +237,12 @@ local musicSets = {
 		category = "Bikers Update",
 		path = "gta5/mpbiker/biker_jaguar",
 		stems = {
-			"BIKER_JAGUAR_STEM_1.mp3",
-			"BIKER_JAGUAR_STEM_2.mp3",
-			"BIKER_JAGUAR_STEM_3.mp3",
-			"BIKER_JAGUAR_STEM_4.mp3",
-			"BIKER_JAGUAR_STEM_5.mp3",
-			"BIKER_JAGUAR_STEM_6.mp3"
+			"BKR_JAGUAR_STEM_1.mp3",
+			"BKR_JAGUAR_STEM_2.mp3",
+			"BKR_JAGUAR_STEM_3.mp3",
+			"BKR_JAGUAR_STEM_4.mp3",
+			"BKR_JAGUAR_STEM_5.mp3",
+			"BKR_JAGUAR_STEM_6.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 } },

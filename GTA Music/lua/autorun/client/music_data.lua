@@ -902,6 +902,21 @@ local musicSets = {
 			cooldown = { 1, 4 }
 		}
 	},
+	menu_music = {
+		name = "Pause Menu",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/menu_music/",
+		stems = {
+			"menu_music_1.mp3",
+			"menu_music_2.mp3",
+			"menu_music_3.mp3",
+			"menu_music_4.mp3",
+			"menu_music_5.mp3",
+			"menu_music_6.mp3",
+			"menu_music_7.mp3",
+		},
+	},
 }
 
 return musicSets

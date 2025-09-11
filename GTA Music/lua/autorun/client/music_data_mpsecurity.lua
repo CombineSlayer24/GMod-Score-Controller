@@ -106,6 +106,13 @@ local musicSets = {
 			"dlc_security_mass_7.mp3",
 			"dlc_security_mass_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 3, 6 }, { 1, 4 }, { 1, 2, 3, 6, 8 } },
+			high = { { 1, 3, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 3, 5, 6, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 3, 4, 6, 7, 8 } },
+			cooldown = { 1, 5, 6 }
+		}
 	},
 
 	dlc_security_space = {

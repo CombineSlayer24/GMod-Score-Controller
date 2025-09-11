@@ -15,6 +15,14 @@ local musicSets = {
 			"HALLOWEEN_2015_7.mp3",
 			"HALLOWEEN_2015_8.mp3",
 		},
+		intensity = {
+			ghost = { { 1 } },
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 2, 3 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 3, 4, 5, 6 }, { 2, 3, 5, 6, 8 } },
+			high = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 }, { 2, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7 } },
+			cooldown = { 2, 4, 6 }
+		}
 	},
 
 	mp231_nh_halloween = {
@@ -33,6 +41,14 @@ local musicSets = {
 			"mp231_nh_halloween_7.mp3",
 			"mp231_nh_halloween_8.mp3",
 		},
+		intensity = {
+			ghost = { { 1 } },
+			low = { { 1 }, { 1, 2 }, { 1, 2, 3 }, { 1, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 3, 4, 5, 6 }, { 1, 2, 5, 6, 8 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 4, 5, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 2, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 4, 6 }
+		}
 	},
 
 	mp241_altsm_halloween = {
@@ -51,6 +67,14 @@ local musicSets = {
 			"mp241_altsm_halloween_7.mp3",
 			"mp241_altsm_halloween_8.mp3",
 		},
+		intensity = {
+			ghost = { { 1 } },
+			low = { { 1 }, { 1, 5 }, { 1, 3, 5 } },
+			medium = { { 1, 3, 4, 6 }, { 1, 4, 5, 6 }, { 1, 4, 6, 8 } },
+			high = { { 1, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 6, 7 }, { 1, 4, 5, 6, 7, 8 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7, 8 }, { 1, 3, 4, 5, 6, 7, 8 } },
+			cooldown = { 1, 4, 8 }
+		}
 	},
 
 	mp251_zsm_jnsns = {
@@ -69,6 +93,14 @@ local musicSets = {
 			"mp251_zsm_jnsns_7.mp3",
 			"mp251_zsm_jnsns_8.mp3",
 		},
+		intensity = {
+			ghost = { { 1 } },
+			low = { { 1 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 2, 4, 5 } },
+			high = { { 1, 2, 3, 4, 6, 7 }, { 1, 2, 3, 4, 5, 7 }, { 1, 2, 3, 4, 5, 6, 7 } },
+			extreme = { 1, 2, 3, 4, 5, 8 },
+			cooldown = { 1, 3, 7 }
+		}
 	},
 }
 

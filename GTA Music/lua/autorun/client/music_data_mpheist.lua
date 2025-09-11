@@ -176,6 +176,20 @@ local musicSets = {
 			heist_failed = { 1, 2 }
 		}
 	},
+
+	NT_TKB = {
+		name = "NT_TKB (Unused Heist Track)",
+		gameOrigin = "GTA: Online",
+		composer = "Tangerine Dream, Woody Jackson ?",
+		category = "Original Heists",
+		path = "gta5/mpheist/nt_tkb",
+		stems = {
+			"NT_TKB_1.mp3",
+			"NT_TKB_2.mp3",
+			"NT_TKB_3.mp3",
+			"NT_TKB_4.mp3"
+		},
+	},
 }
 
 return musicSets

@@ -69,18 +69,34 @@ local musicSets = {
 	hei4_prep_r02 = {
 		name = "Prep Track R02",
 		gameOrigin = "GTA: Online",
-		composer = "&ME",
+		composer = "Rampa",
 		category = "Cayo Perico Heist",
 		path = "gta5/mpheist4/hei4_prep_track_r02",
 		stems = {
-			"HEI4_PREP_R02_1.mp3",
-			"HEI4_PREP_R02_2.mp3",
-			"HEI4_PREP_R02_3.mp3",
-			"HEI4_PREP_R02_4.mp3",
-			"HEI4_PREP_R02_5.mp3",
-			"HEI4_PREP_R02_6.mp3",
-			"HEI4_PREP_R02_7.mp3",
-			"HEI4_PREP_R02_8.mp3",
+			"HEI4_PREP_TRACK_R02_1.mp3",
+			"HEI4_PREP_TRACK_R02_2.mp3",
+			"HEI4_PREP_TRACK_R02_3.mp3",
+			"HEI4_PREP_TRACK_R02_4.mp3",
+			"HEI4_PREP_TRACK_R02_5.mp3",
+			"HEI4_PREP_TRACK_R02_6.mp3",
+			"HEI4_PREP_TRACK_R02_7.mp3",
+			"HEI4_PREP_TRACK_R02_8.mp3",
+		},
+	},
+
+	hei4_prep_r06 = {
+		name = "Prep Track R06",
+		gameOrigin = "GTA: Online",
+		composer = "Rampa",
+		category = "Cayo Perico Heist",
+		path = "gta5/mpheist4/hei4_prep_track_r06",
+		stems = {
+			"HEI4_PREP_TRACK_R06_1.mp3",
+			"HEI4_PREP_TRACK_R06_2.mp3",
+			"HEI4_PREP_TRACK_R06_3.mp3",
+			"HEI4_PREP_TRACK_R06_4.mp3",
+			"HEI4_PREP_TRACK_R06_5.mp3",
+			"HEI4_PREP_TRACK_R06_6.mp3",
 		},
 	},
 	
@@ -100,6 +116,13 @@ local musicSets = {
 			"HEI4_FIN_TRACK_A03_7.mp3",
 			"HEI4_FIN_TRACK_A03_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 4 }, { 1, 2, 3, 4 } },
+			medium = { { 1, 3, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 6, 8 } },
+			high = { { 1, 7 }, { 1, 4, 7, 8 }, { 1, 3, 4, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 3, 4, 6, 7, 8 } },
+			cooldown = { 1, 5, 6 }
+		}
 	},
 
 	hei4_fin_m05 = {
@@ -136,6 +159,13 @@ local musicSets = {
 			"HEI4_FIN_TRACK_R08_7.mp3",
 			"HEI4_FIN_TRACK_R08_8.mp3",
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 } },
+			medium = { { 1, 3, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 6, 8 } },
+			high = { { 1, 3, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 3, 5, 6, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 3, 4, 6, 7, 8 } },
+			cooldown = { 1, 5, 6 }
+		}
 	},
 }
 

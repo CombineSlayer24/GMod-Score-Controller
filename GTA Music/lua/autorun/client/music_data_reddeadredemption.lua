@@ -114,6 +114,24 @@ local musicSets = {
 		},
 	},
 
+	ftr5 = {
+		name = "FTR5",
+		gameOrigin = "Red Dead Redemption",
+		composer = "Bill Elm, Woody Jackson",
+		category = "Frontier",
+		path = "rdr1/ftr05/",
+		stems = {
+			"FTR_SONG_05_1.mp3",
+			"FTR_SONG_05_2.mp3",
+			"FTR_SONG_05_3.mp3",
+			"FTR_SONG_05_4.mp3",
+			"FTR_SONG_05_5.mp3",
+			"FTR_SONG_05_6.mp3",
+			"FTR_SONG_05_7.mp3",
+			"FTR_SONG_05_8.mp3"
+		},
+	},
+
 	zmb_nrt_song_01 = {
 		name = "ZMB NRT 1",
 		gameOrigin = "Red Dead Redemption: Undead Nightmares",

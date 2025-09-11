@@ -1209,69 +1209,73 @@ cvarsAddChangeCallback( "gtamusic_volume", function( _, _, newVal )
 	end
 end )
 
-cvarsAddChangeCallback( "gtamusic_setname", function( _, _, newVal )
-	local set = newVal or "alc_vodka"
-	if not musicSets or table.IsEmpty( musicSets ) then
-		if CLIENT then
-			chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Error: No music sets available" )
-			surface.PlaySound( "ui/error.wav" )
-		end
-		DebugPrint( "Error: No music sets available in musicSets" )
-		isChangingSet = false
-		return
-	end
-	if not musicSets[ set ] then
-		if CLIENT then
-			chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Error: Invalid music set:", Color( 240, 200, 80 ), set )
-			surface.PlaySound( "ui/error.wav" )
-		end
-		DebugPrint( "Invalid set selected:", set )
-		isChangingSet = false
-		return
-	end
+cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
+    local set = newVal or "alc_vodka"
+    if not musicSets or table.IsEmpty(musicSets) then
+        if CLIENT then
+            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available")
+            surface.PlaySound("ui/error.wav")
+        end
+        DebugPrint("Error: No music sets available in musicSets")
+        isChangingSet = false
+        return
+    end
+    if not musicSets[set] then
+        if CLIENT then
+            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: Invalid music set:", Color(240, 200, 80), set)
+            surface.PlaySound("ui/error.wav")
+        end
+        DebugPrint("Invalid set selected:", set)
+        isChangingSet = false
+        return
+    end
 
-	local duration = cvFadeTime:GetFloat()
-	timerSimple( 0.1, function()
-		RunConsoleCommand( "gtamusic_stop" )
-		if CLIENT then
-			chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Stopping Stems. Do not trigger any stems until next track is loaded!" )
-			surface.PlaySound( "ui/blip.wav" )
-		end
-	end )
+    -- Store the user's current fade time and set to 1 second for set change
+    local originalFadeTime = cvFadeTime:GetFloat()
+    RunConsoleCommand("gtamusic_fadetime", "1")
 
-	timerSimple( duration, function()
-		currentSet = set
-		if PrecacheStems( set ) then
-			StartStems( set )
-		end
-		if CLIENT then
-			chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Music Set ", Color( 240, 200, 80 ), set, Color( 255, 255, 255 ), " is loaded" )
-			surface.PlaySound( "ui/0x0E60F7B2.wav" )
-			
-			if GTAMusicMenu.UpdateInfo then
-				GTAMusicMenu.UpdateInfo()
-			end
-			if IsValid( GTAMusicMenu.setList ) then
-				for _, line in ipairs( GTAMusicMenu.setList:GetLines() ) do
-					if line.set == set then
-						GTAMusicMenu.setList:SelectItem( line )
-						break
-					end
-				end
-			end
-			if GTAMusicMenu.UpdateIntensityList then
-				GTAMusicMenu.UpdateIntensityList()
-			end
-		end
-		DebugPrint( "Switched to set:", set )
-		if SERVER then
-			net.Start( "GTAMusic_SetSet" )
-			net.WriteString( set )
-			net.Broadcast()
-		end
-		isChangingSet = false
-	end )
-end )
+    timerSimple(0.1, function()
+        RunConsoleCommand("gtamusic_stop")
+        if CLIENT then
+            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Stopping Stems. Do not trigger any stems until next track is loaded!")
+            surface.PlaySound("ui/blip.wav")
+        end
+    end)
+
+    timerSimple(1.0, function()  -- Use fixed 1-second delay to match temporary fade time
+        currentSet = set
+        if PrecacheStems(set) then
+            StartStems(set)
+        end
+        -- Restore the user's original fade time
+        RunConsoleCommand("gtamusic_fadetime", tostring(originalFadeTime))
+        if CLIENT then
+            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Music Set ", Color(240, 200, 80), set, Color(255, 255, 255), " is loaded")
+            surface.PlaySound("ui/0x0E60F7B2.wav")
+            if GTAMusicMenu.UpdateInfo then
+                GTAMusicMenu.UpdateInfo()
+            end
+            if IsValid(GTAMusicMenu.setList) then
+                for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
+                    if line.set == set then
+                        GTAMusicMenu.setList:SelectItem(line)
+                        break
+                    end
+                end
+            end
+            if GTAMusicMenu.UpdateIntensityList then
+                GTAMusicMenu.UpdateIntensityList()
+            end
+        end
+        DebugPrint("Switched to set:", set)
+        if SERVER then
+            net.Start("GTAMusic_SetSet")
+            net.WriteString(set)
+            net.Broadcast()
+        end
+        isChangingSet = false
+    end)
+end)
 
 cvarsAddChangeCallback( "gtamusic_randomize_intensity", function( _, _, newVal )
 	if tonumber( newVal ) == 1 and currentIntensity and musicSets[ currentSet ] and musicSets[ currentSet ].intensity then

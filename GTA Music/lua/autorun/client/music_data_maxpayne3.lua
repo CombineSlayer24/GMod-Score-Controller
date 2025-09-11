@@ -119,6 +119,9 @@ local musicSets = {
 			"FINALE_SONG_02_1.mp3",
 			"FINALE_SONG_02_2.mp3",
 		},
+		intensity = {
+			airport_shootout = { { 1, 2 } }
+		}
 	},
 
 	hotel_song_final = {
@@ -147,6 +150,14 @@ local musicSets = {
 			"NIGHTCLUB_01_3.mp3",
 			"NIGHTCLUB_01_4.mp3"
 		},
+		intensity = {
+			low = { { 2 } },
+			medium = { { 1, 2 } },
+			high = { { 1, 3 }, { 1, 3 } },
+			extreme = { { 1, 2, 3, 4 }, { 1, 3, 4 } },
+			helicopter = { { 4 }, { 2, 4 } },
+			cooldown = { 1 }
+		}
 	},
 
 	nybar = {
@@ -168,6 +179,7 @@ local musicSets = {
 			medium = { { 1, 2, }, { 2, 3, }, { 2, 3, 6 }, { 2, 3, 6 } },
 			high = { { 1, 3, 5 }, { 3, 5, 6 }, { 1, 5, 6 }, { 3, 5 }, { 1, 5 }, { 5 }, { 5, 6 } },
 			extreme = { { 1, 4 }, { 4, 6 }, { 3, 4, 6 }, { 4 } },
+			cooldown = { 1, 3 }
 		}
 	},
 
@@ -215,9 +227,11 @@ local musicSets = {
 			"PANAMA_FINAL_6.mp3"
 		},
 		intensity = {
-			low = { { 1, 2 }, { 2, 3 }, { 2, 4 } },
-			medium = { { 2, 3 }, { 2 }, { 2, 4 }, { 2, 3, 1} },
-			high = { { 2 , 5, 6, 7 }, { 1, 3, 6 }, { 1, 2, 4 }, { 3, 6 } },
+			low = { { 2 }, { 1, 2 }, { 1, 2, 3 }, { 2, 3 } },
+			medium = { { 2, 4, 5 }, { 3, 4, 5 }, { 1, 2, 4, 5 } },
+			high = { { 2, 5, 6 }, { 1, 2, 5, 6 } },
+			extreme = { { 1, 2, 5, 6 } },
+			cooldown = { 1, 5 }
 		}
 	},
 
@@ -263,6 +277,13 @@ local musicSets = {
 			"STADIUM_FINAL_SONG_5.mp3",
 			"STADIUM_FINAL_SONG_6.mp3"
 		},
+		intensity = {
+			low = { { 1, 5 }, { 1 } },
+			medium = { { 1, 2, 5 }, { 2, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 5 } },
+			extreme = { { 2, 3, 5, 6 } },
+			cooldown = { 4, 5 }
+		}
 	}
 }
 
