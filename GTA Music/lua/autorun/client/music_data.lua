@@ -341,11 +341,11 @@ local musicSets = {
 			"RG10_8.mp3"
 		},
 		intensity = {
-			low = { { 1, 2 }, { 1, 2, 3 }, { 2 } },
-			medium = { { 1, 2, 3, 4, 6 }, { 2, 3, 4, 6, 8 }, { 2, 3, 5, 6 } },
-			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6 }, { 2, 3, 4, 6, 7, 8 } },
-			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
-			cooldown = { { 1, 3, 8 } },
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 2, 3, 4, 5, 6 }, { 2, 3, 4, 6, 8 }, { 2, 3, 5, 6, 8 } },
+			high = { { 2, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 }, { 2, 4, 6, 7, 8 }, { 2, 6, 7 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 }, { 2, 4, 6, 7, 8 } },
+			cooldown = { 6 }
 		}
 	},
 
@@ -365,11 +365,11 @@ local musicSets = {
 			"RG15_8.mp3"
 		},
 		intensity = {
-			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
-			medium = { { 2, 3, 4, 6 }, { 2, 4, 6, 7, 8 }, { 2, 3, 5, 6, 8 } },
-			high = { { 2, 3, 4, 6, 7 }, { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7, 8 } },
-			extreme = { { 2, 3, 4, 5, 6, 7 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 4, 6, 7, 8 } },
-			cooldown = { 2, 3, 6 },
+			low = { { 1, 2 }, { 1, 2, 3 }, { 2, 3 } },
+			medium = { { 2, 3, 4, 6 }, { 1, 2, 4, 6 }, { 1, 2, 3, 6, 8 } },
+			high = { { 1, 2, 6, 7 }, { 2, 3, 6, 7 }, { 2, 6, 7, 8 } },
+			extreme = { { 1, 2, 6, 7, 8 }, { 2, 6, 7, 8 } },
+			cooldown = { { 2 }, { 2, 6 } },
 			
 			★★★ = { { 2, 5 }, { 2, 5, 8 }, { 5, 6, 8 }, { 2, 6 }, { 2, 3, 6 } },
 			★★★★ = { { 2, 3, 6 }, { 2, 3, 6, 7, 8 }, { 5, 6, 8 }, { 6, 7, 8 }, { 5 , 6 } },
@@ -916,6 +916,123 @@ local musicSets = {
 			"menu_music_6.mp3",
 			"menu_music_7.mp3",
 		},
+	},
+
+	ht_agency_prepa = {
+		name = "HT Agency Prep A",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_agency_prepa/",
+		category = "Heist Preps",
+		stems = { "HT_AGENCY_PREPA_1.mp3" },
+	},
+
+	ht_agency_prepb_arhictect = {
+		name = "HT Agency Prep B Architect",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_agency_prepb_arhictect/",
+		category = "Heist Preps",
+		stems = { "HT_AGENCY_PREPB_ARCHITECT_1.mp3" },
+	},
+
+	ht_agency_setup = {
+		name = "HT Agency Setup",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_agency_setup/",
+		category = "Heist Preps",
+		stems = { "HT_AGENCY_SETUP_1.mp3" },
+	},
+
+	ht_big_score_prepa = {
+		name = "HT Big Score Prep A",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_big_score_prepa/",
+		category = "Heist Preps",
+		stems = { "HT_BIG_SCORE_PREPA_1.mp3" },
+	},
+
+	ht_big_score_prepb = {
+		name = "HT Big Score Prep B",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_big_score_prepb/",
+		category = "Heist Preps",
+		stems = { "HT_BIG_SCORE_PREPB_1.mp3" },
+	},
+
+	ht_big_score_setup = {
+		name = "HT Big Score Setup",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_big_score_setup/",
+		category = "Heist Preps",
+		stems = { "HT_BIG_SCORE_SETUP_1.mp3" },
+	},
+
+	ht_jewel_prep1a = {
+		name = "HT Jewel Prep 1A",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_jewel_prep1a/",
+		category = "Heist Preps",
+		stems = { "HT_JEWEL_PREP1A_1.mp3" },
+	},
+
+	ht_jewel_prep2a = {
+		name = "HT Jewel Prep 2A",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_jewel_prep2a/",
+		category = "Heist Preps",
+		stems = { "HT_JEWEL_PREP2A_1.mp3" },
+	},
+
+	ht_jewel_setup = {
+		name = "HT Jewel Setup",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_jewel_setup/",
+		category = "Heist Preps",
+		stems = { "HT_JEWEL_SETUP_1.mp3" },
+	},
+
+	ht_paleto_prepa = {
+		name = "HT Paleto Prep A",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_paleto_prepa/",
+		category = "Heist Preps",
+		stems = { "HT_PALETO_PREPA_1.mp3" },
+	},
+
+	ht_paleto_setup = {
+		name = "HT Paleto Setup",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_paleto_setup/",
+		category = "Heist Preps",
+		stems = { "HT_PALETO_SETUP_1.mp3" },
+	},
+
+	ht_port_steal_sub = {
+		name = "HT Port Steal Sub",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_port_steal_sub/",
+		category = "Heist Preps",
+		stems = { "HT_PORT_STEAL_SUB_1.mp3" },
+	},
+
+	ht_port_survey_docks = {
+		name = "HT Port Survey Docks",
+		gameOrigin = "Grand Theft Auto V",
+		composer = "Tangerine Dream",
+		path = "gta5/story/heist_preps/ht_port_survey_docks/",
+		category = "Heist Preps",
+		stems = { "HT_PORT_SURVEY_DOCKS_1.mp3" },
 	},
 }
 

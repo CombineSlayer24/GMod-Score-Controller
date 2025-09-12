@@ -14,6 +14,13 @@ local musicSets = {
 			"dlc_cm2022_cctrack_2_5.mp3",
 			"dlc_cm2022_cctrack_2_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 4 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 3 } },
+			high = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { { 2, 4 }, { 2, 5 } }
+		}
 	},
 
 	dlc_cm2022_cctrack_5 = {
@@ -30,6 +37,14 @@ local musicSets = {
 			"dlc_cm2022_cctrack_5_5.mp3",
 			"dlc_cm2022_cctrack_5_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 4 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 3 } },
+			high = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5 }, { 1, 3, 5 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { { 2, 4, 6 }, { 4, 5 } }
+		}
+
 	},
 
 	dlc_cm2022_cctrack_6 = {
@@ -46,6 +61,13 @@ local musicSets = {
 			"dlc_cm2022_cctrack_6_5.mp3",
 			"dlc_cm2022_cctrack_6_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 4 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 3 } },
+			high = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { { 2, 4, 6 }, { 2, 5 } }
+		}
 	},
 
 	dlc_cm2022_cctrack_9 = {
@@ -62,6 +84,14 @@ local musicSets = {
 			"dlc_cm2022_cctrack_9_5.mp3",
 			"dlc_cm2022_cctrack_9_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 4 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 3 } },
+			high = { { 1, 3, 4, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { { 2, 6 }, { 2, 5 } }
+		}
+
 	},
 
 	dlc_cm2022_cctrack_11 = {
@@ -78,6 +108,13 @@ local musicSets = {
 			"dlc_cm2022_cctrack_11_5.mp3",
 			"dlc_cm2022_cctrack_11_6.mp3"
 		},
+		intensity = {
+			low = { { 1 }, { 1, 2 }, { 1, 2, 4 } },
+			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 3, 6 } },
+			high = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 3, 4, 5, 6 } },
+			cooldown = { { 2, 4, 6 }, { 2, 4 } }
+		}
 	},
 
 	music_box_nh_creepy_clown_track = {
