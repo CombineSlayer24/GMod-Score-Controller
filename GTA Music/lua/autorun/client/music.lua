@@ -15,20 +15,21 @@ local isChangingSet = false  -- Flag to prevent concurrent set changes
 local nextIntensityTime = 0  -- Time for next random intensity change
 local musicSets = CLIENT and include( "autorun/client/music_data.lua" ) or {}  -- Load music sets only on client
 local expandedCategories = {}
+local stemBaseVolumeMultipliers = {}  -- Linear multiplier per stem (from dB adjustments)
 
 -- Client menu state
 if CLIENT then
-	GTAMusicMenu = GTAMusicMenu or {}
+	StemControllerMenu = StemControllerMenu or {}
 end
 
 -- Client convars
-local cvMusicVolume = CreateClientConVar( "gtamusic_volume", "0.6", true, false, "Overall music volume (0-1)" )
-local cvFadeTime = CreateClientConVar( "gtamusic_fadetime", "2.0", true, false, "Fade in/out duration in seconds", 0, 10 )
-local cvPlaybackRate = CreateClientConVar( "gtamusic_playbackrate", "1.0", true, false, "Playback speed multiplier", 0.5, 2 )
-local cvDebug = CreateClientConVar( "gtamusic_debug", "0", true, false, "Enable debug prints and HUD (1=on)" )
-local cvMusicSet = CreateClientConVar( "gtamusic_setname", "alc_vodka", true, false, "Music set to play (alc_vodka, alc_pb2_pussyface, nrt4, nybar, cemetery, td_vacuum)" )
-local cvRandomIntensity = CreateClientConVar( "gtamusic_intensitysequences", "0", true, false, "Randomly switch intensity sequences every 30 seconds." )
-local cvRandomSet = CreateClientConVar( "gtamusic_randomset", "1", true, false, "Randomize music set on spawn (1=on)" )
+local cvMusicVolume = CreateClientConVar( "StemController_volume", "0.6", true, false, "Overall music volume (0-1)" )
+local cvFadeTime = CreateClientConVar( "StemController_fadetime", "2.0", true, false, "Fade in/out duration in seconds", 0, 10 )
+local cvPlaybackRate = CreateClientConVar( "StemController_playbackrate", "1.0", true, false, "Playback speed multiplier", 0.5, 2 )
+local cvDebug = CreateClientConVar( "StemController_debug", "0", true, false, "Enable debug prints and HUD (1=on)" )
+local cvMusicSet = CreateClientConVar( "StemController_setname", "alc_vodka", true, false, "Music set to play (alc_vodka, alc_pb2_pussyface, nrt4, nybar, cemetery, td_vacuum)" )
+local cvRandomIntensity = CreateClientConVar( "StemController_intensitysequences", "0", true, false, "Randomly switch intensity sequences every 30 seconds." )
+local cvRandomSet = CreateClientConVar( "StemController_randomset", "1", true, false, "Randomize music set on spawn (1=on)" )
 
 -- Lua shortcuts
 local CurTime = CurTime
@@ -63,12 +64,12 @@ local randomIntensityTime = 31
 
 -- Server networking
 if SERVER then
-	util.AddNetworkString( "GTAMusic_SetSet" )
-	util.AddNetworkString( "GTAMusic_TriggerStem" )
-	util.AddNetworkString( "GTAMusic_TriggerIntensity" )
-	util.AddNetworkString( "GTAMusic_Volume" )
-	util.AddNetworkString( "GTAMusic_Stop" )
-	util.AddNetworkString( "GTAMusic_Randomize_Stems" )
+	util.AddNetworkString( "StemController_SetSet" )
+	util.AddNetworkString( "StemController_TriggerStem" )
+	util.AddNetworkString( "StemController_TriggerIntensity" )
+	util.AddNetworkString( "StemController_Volume" )
+	util.AddNetworkString( "StemController_Stop" )
+	util.AddNetworkString( "StemController_Randomize_Stems" )
 end
 
 local function FormatTime( seconds )
@@ -79,7 +80,7 @@ end
 
 local function DebugPrint( ... )
 	if cvDebug:GetBool() then
-		print( "[GTAMusic Debug]", ... )
+		print( "[StemController Debug]", ... )
 	end
 end
 
@@ -123,7 +124,7 @@ local function LoadMusicData()
 
 	if table.IsEmpty(musicSets) then
 		if CLIENT then
-			chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available")
+			chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: No music sets available")
 		end
 	end
 end
@@ -184,8 +185,9 @@ local function StartStems(set)
     currentStems = {} -- Clear the table
     stemStates = {}
     stemVolumes = {}
+    stemBaseVolumeMultipliers = {}  -- Clear base multipliers
     currentIntensity = nil
-    timerRemove("GTAMusic_Randomize_Intensity")
+    timerRemove("StemController_Randomize_Intensity")
     DebugPrint("Cleared old stems and related state")
 
     if not musicSets[set] then
@@ -224,6 +226,13 @@ local function StartStems(set)
             currentStems[i] = channel
             stemStates[i] = false
             stemVolumes[i] = 0
+
+            -- Compute base multiplier from dB adjustment (new)
+            local dbAdjustment = (musicSets[set].stemVolumeAdjustment and musicSets[set].stemVolumeAdjustment[i]) or 0
+            local baseVolumeMultiplier = 10 ^ (dbAdjustment / 20)  -- dB to linear (e.g., -5 dB -> ~0.562)
+            stemBaseVolumeMultipliers[i] = baseVolumeMultiplier
+            DebugPrint("Stem", i, "base dB:", dbAdjustment, "| multiplier:", baseVolumeMultiplier)
+
             stemCount = stemCount + 1
             DebugPrint("Stem", i, "started | Duration:", FormatTime(duration), "| Start:", FormatTime(startTime), "| Active:", stemStates[i])
         end)
@@ -238,7 +247,7 @@ local function StartStems(set)
     end)
 
     if cvRandomIntensity:GetBool() and currentIntensity then
-        timerCreate("GTAMusic_Randomize_Intensity", randomIntensityTime, 0, function()
+        timerCreate("StemController_Randomize_Intensity", randomIntensityTime, 0, function()
             if currentIntensity and musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[currentIntensity] then
                 TriggerIntensity(currentIntensity)
             end
@@ -246,34 +255,38 @@ local function StartStems(set)
     end
 end
 
--- Fade stem volume
-local function FadeStem( stem, targetVol )
-	if not currentStems[ stem ] or not IsValid( currentStems[ stem ] ) then return end
-	local duration = cvFadeTime:GetFloat()
-	if duration <= 0 then
-		currentStems[ stem ]:SetVolume( targetVol )
-		stemVolumes[ stem ] = targetVol
-		DebugPrint( "Stem", stem, "set to volume:", targetVol )
-		return
-	end
+local function FadeStem(stem, targetVol)
+    if not currentStems[stem] or not IsValid(currentStems[stem]) then return end
+    local duration = cvFadeTime:GetFloat()
+    if duration <= 0 then
+        local effectiveVol = targetVol * (stemBaseVolumeMultipliers[stem] or 1)  -- Apply base adjustment
+        currentStems[stem]:SetVolume(effectiveVol)
+        stemVolumes[stem] = effectiveVol
+        DebugPrint("Stem", stem, "set to effective volume:", effectiveVol, "(base mult:", stemBaseVolumeMultipliers[stem] or 1, ")")
+        return
+    end
 
-	local startTime = CurTime()
-	local startVol = stemVolumes[ stem ] or 0
-	local hookId = "GTAMusic_FadeStem_" .. stem
-	hookAdd( "Think", hookId, function()
-		if not IsValid( currentStems[ stem ] ) then
-			hookRemove( "Think", hookId )
-			return
-		end
-		local progress = math.min( ( CurTime() - startTime ) / duration, 1 )
-		local newVol = Lerp( progress, startVol, targetVol )
-		currentStems[ stem ]:SetVolume( newVol )
-		stemVolumes[ stem ] = newVol
-		if progress >= 1 then
-			hookRemove( "Think", hookId )
-			DebugPrint( "Stem", stem, "fade complete to volume:", targetVol )
-		end
-	end )
+    local startTime = CurTime()
+    local startVol = stemVolumes[stem] or 0
+    local baseMult = stemBaseVolumeMultipliers[stem] or 1
+    local effectiveTargetVol = targetVol * baseMult  -- Apply base adjustment
+    local hookId = "StemController_FadeStem_" .. stem
+    hookAdd("Think", hookId, function()
+        if not IsValid(currentStems[stem]) then
+            hookRemove("Think", hookId)
+            return
+        end
+        local progress = math.min((CurTime() - startTime) / duration, 1)
+        -- Use quadratic interpolation for slow start and faster end
+        local quadProgress = progress * progress  -- Quadratic curve: slow at start, faster at end
+        local lerpedVol = Lerp(quadProgress, startVol, effectiveTargetVol)
+        currentStems[stem]:SetVolume(lerpedVol)
+        stemVolumes[stem] = lerpedVol
+        if progress >= 1 then
+            hookRemove("Think", hookId)
+            DebugPrint("Stem", stem, "fade complete to effective volume:", effectiveTargetVol, "(base mult:", baseMult, ")")
+        end
+    end)
 end
 
 -- Toggle stem on/off
@@ -286,7 +299,7 @@ local function TriggerStem( stem )
 	local targetVol = stemStates[ stem ] and cvMusicVolume:GetFloat() or 0
 	FadeStem( stem, targetVol )
 	currentIntensity = nil
-	timerRemove( "GTAMusic_Randomize_Intensity" )
+	timerRemove( "StemController_Randomize_Intensity" )
 	DebugPrint( "Stem", stem, stemStates[ stem ] and "enabled" or "disabled" )
 end
 
@@ -294,7 +307,7 @@ local comboIndex = {}
 
 -- Trigger stems by intensity level
 -- Trigger stems by intensity level
-local function TriggerIntensity( intensity )
+local function TriggerIntensity(intensity)
     local maxStems = musicSets[currentSet] and #musicSets[currentSet].stems or MAX_STEMS
     local intensityCombos = musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[intensity]
     if not intensityCombos then
@@ -304,16 +317,11 @@ local function TriggerIntensity( intensity )
 
     -- Initialize combo index for the current set and intensity
     comboIndex[currentSet] = comboIndex[currentSet] or {}
-    -- Reset sequence to 1 if intensity has changed
-    if currentIntensity ~= intensity then
-        comboIndex[currentSet][intensity] = 1
+    -- Always increment sequence index if staying on the same intensity and multiple combos exist
+    if currentIntensity == intensity and type(intensityCombos[1]) == "table" then
+        comboIndex[currentSet][intensity] = ((comboIndex[currentSet][intensity] or 0) % #intensityCombos) + 1
     else
-        -- Increment sequence index only if random intensity is enabled and staying on the same intensity
-        if cvRandomIntensity:GetBool() and type(intensityCombos[1]) == "table" then
-            comboIndex[currentSet][intensity] = ((comboIndex[currentSet][intensity] or 0) % #intensityCombos) + 1
-        else
-            comboIndex[currentSet][intensity] = comboIndex[currentSet][intensity] or 1
-        end
+        comboIndex[currentSet][intensity] = 1 -- Reset to 1 if intensity changes
     end
 
     local selectedCombo
@@ -341,15 +349,16 @@ local function TriggerIntensity( intensity )
     end
     currentIntensity = intensity
 
+    -- Handle random intensity cycling only if enabled
     if cvRandomIntensity:GetBool() and musicSets[currentSet] and musicSets[currentSet].intensity and type(intensityCombos[1]) == "table" then
         nextIntensityTime = CurTime() + randomIntensityTime
-        timerCreate("GTAMusic_Randomize_Intensity", randomIntensityTime, 1, function()
+        timerCreate("StemController_Randomize_Intensity", randomIntensityTime, 1, function()
             if musicSets[currentSet] and musicSets[currentSet].intensity and musicSets[currentSet].intensity[intensity] then
                 TriggerIntensity(intensity)
             end
         end)
     else
-        timerRemove("GTAMusic_Randomize_Intensity")
+        timerRemove("StemController_Randomize_Intensity")
         nextIntensityTime = 0
     end
     DebugPrint("Triggered intensity:", intensity, "| Selected combination:", tableConcat(selectedCombo, ", "))
@@ -379,7 +388,7 @@ local function RandomizeStems()
 		end
 	end
 	currentIntensity = nil
-	timerRemove( "GTAMusic_Randomize_Intensity" )
+	timerRemove( "StemController_Randomize_Intensity" )
 	nextIntensityTime = 0
 	DebugPrint( "Randomized stems:", tableConcat( selectedStems, ", " ) )
 end
@@ -409,7 +418,7 @@ function ChangeMusicSet(mode, specificSet)
 			local sets = table.GetKeys(musicSets)
 			newSet = sets[math.random(1, #sets)]
 			if CLIENT then
-				chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "No other sets in category, selecting random set")
+				chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "No other sets in category, selecting random set")
 			end
 		end
 	elseif mode == "next" then
@@ -420,7 +429,7 @@ function ChangeMusicSet(mode, specificSet)
 	end
 
 	if newSet then
-		RunConsoleCommand("gtamusic_setname", newSet)
+		RunConsoleCommand("StemController_setname", newSet)
 	else
 		isChangingSet = false
 	end
@@ -438,7 +447,7 @@ local function ReloadMusicData()
 	-- Check if musicSets is populated
 	if not musicSets or table.IsEmpty(musicSets) then
 		if CLIENT then
-			chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: Failed to reload music data, no sets available")
+			chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: Failed to reload music data, no sets available")
 			surface.PlaySound("ui/error.wav")
 		end
 		DebugPrint("Error: Failed to reload music data, musicSets is empty")
@@ -448,33 +457,33 @@ local function ReloadMusicData()
 
 	-- Notify client of successful reload
 	if CLIENT then
-		chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Music data reloaded successfully")
+		chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Music data reloaded successfully")
 		surface.PlaySound("ui/0x0E60F7B2.wav")
 	end
 	DebugPrint("Music data reloaded, sets available:", tableConcat(tableGetKeys(musicSets), ", "))
 
 	-- Update UI if menu is open
 	if CLIENT then
-		if GTAMusicMenu.UpdateInfo then
-			GTAMusicMenu.UpdateInfo()
+		if StemControllerMenu.UpdateInfo then
+			StemControllerMenu.UpdateInfo()
 		end
-		if GTAMusicMenu.UpdateIntensityList then
-			GTAMusicMenu.UpdateIntensityList()
+		if StemControllerMenu.UpdateIntensityList then
+			StemControllerMenu.UpdateIntensityList()
 		end
-		if IsValid(GTAMusicMenu.setList) then
+		if IsValid(StemControllerMenu.setList) then
 			DebugPrint("Reloading set list with sets:", tableConcat(tableGetKeys(musicSets), ", "))
-			GTAMusicMenu.setList:Clear() -- Explicitly clear the list
+			StemControllerMenu.setList:Clear() -- Explicitly clear the list
 			timer.Simple(0.1, function()
-				if IsValid(GTAMusicMenu.setList) then
+				if IsValid(StemControllerMenu.setList) then
 					PopulateSetList()
 					-- Select the current set in the UI
-					for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
+					for _, line in ipairs(StemControllerMenu.setList:GetLines()) do
 						if line.set == currentSet then
-							GTAMusicMenu.setList:SelectItem(line)
+							StemControllerMenu.setList:SelectItem(line)
 							break
 						end
 					end
-					DebugPrint("Set list repopulated with", #GTAMusicMenu.setList:GetLines(), "lines")
+					DebugPrint("Set list repopulated with", #StemControllerMenu.setList:GetLines(), "lines")
 				end
 			end)
 		end
@@ -483,18 +492,18 @@ local function ReloadMusicData()
 	-- Determine the set to play
 	local setToPlay = musicSets[oldSet] and oldSet or (tableGetKeys(musicSets)[1] or "alc_vodka")
 	if setToPlay ~= oldSet and CLIENT then
-		chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Previous set ", Color(240, 200, 80), oldSet, Color(255, 255, 255), " no longer exists, switching to ", Color(240, 200, 80), setToPlay)
+		chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Previous set ", Color(240, 200, 80), oldSet, Color(255, 255, 255), " no longer exists, switching to ", Color(240, 200, 80), setToPlay)
 		surface.PlaySound("ui/error.wav")
 	end
 
 	-- Update currentSet and trigger set change
 	currentSet = setToPlay
 	if SERVER then
-		net.Start("GTAMusic_SetSet")
+		net.Start("StemController_SetSet")
 		net.WriteString(currentSet)
 		net.Broadcast()
 	end
-	RunConsoleCommand("gtamusic_setname", currentSet)
+	RunConsoleCommand("StemController_setname", currentSet)
 end
 
 -- Client networking and UI
@@ -525,75 +534,75 @@ if CLIENT then
 		return btn
 	end
 
-	list.Set( "DesktopWindows", "gtamusic", {
-		title = "GTA Music Menu",
+	list.Set( "DesktopWindows", "StemController", {
+		title = "Stem Controller Menu",
 		icon = "icon16/music.png",
 		width = 150,
 		height = 30,
 		onewindow = true,
 		init = function( icon, frame )
 			if not musicSets or table.IsEmpty( musicSets ) then
-				chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
+				chat.AddText( Color( 93, 182, 229 ), "[StemController] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
 				surface.PlaySound( "ui/error.wav" )
 				frame:Close() -- Close the frame if no music sets are available
 				return
 			end
-			RunConsoleCommand( "gtamusic_menu" )
+			RunConsoleCommand( "StemController_menu" )
 			frame:Close() -- Close the frame immediately after running the command
 		end
 	})
 
-	list.Set( "DesktopWindows", "gtamusicstems", {
-		title = "GTA Music Stem Menu",
+	list.Set( "DesktopWindows", "StemControllerstems", {
+		title = "Stem Controller Stem Menu",
 		icon = "icon16/application_view_list.png",
 		width = 150,
 		height = 30,
 		onewindow = true,
 		init = function( icon, frame )
 			if not musicSets or table.IsEmpty( musicSets ) then
-				chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
+				chat.AddText( Color( 93, 182, 229 ), "[StemController] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
 				surface.PlaySound( "ui/error.wav" )
 				frame:Close()
 				return
 			end
-			RunConsoleCommand( "gtamusic_stemmenu" )
+			RunConsoleCommand( "StemController_stemmenu" )
 			frame:Close()
 		end
 	})
 
-	net.Receive( "GTAMusic_SetSet", function()
+	net.Receive( "StemController_SetSet", function()
 		local set = net.ReadString()
 		cvMusicSet:SetString( set )
 	end )
 
-	net.Receive( "GTAMusic_TriggerStem", function()
+	net.Receive( "StemController_TriggerStem", function()
 		local stem = net.ReadUInt( 4 )
-		RunConsoleCommand( "gtamusic_triggerstem", stem )
+		RunConsoleCommand( "StemController_triggerstem", stem )
 	end )
 
-	net.Receive( "GTAMusic_TriggerIntensity", function()
+	net.Receive( "StemController_TriggerIntensity", function()
 		local intensity = net.ReadString()
-		RunConsoleCommand( "gtamusic_triggerintensity", intensity )
+		RunConsoleCommand( "StemController_triggerintensity", intensity )
 	end )
 
-	net.Receive( "GTAMusic_Volume", function()
+	net.Receive( "StemController_Volume", function()
 		local vol = net.ReadFloat()
-		RunConsoleCommand( "gtamusic_volume", vol )
+		RunConsoleCommand( "StemController_volume", vol )
 	end )
 
-	net.Receive( "GTAMusic_Stop", function()
-		RunConsoleCommand( "gtamusic_stop" )
+	net.Receive( "StemController_Stop", function()
+		RunConsoleCommand( "StemController_stop" )
 	end )
 
-	net.Receive( "GTAMusic_Randomize_Stems", function()
-		RunConsoleCommand( "gtamusic_randomize_stems" )
+	net.Receive( "StemController_Randomize_Stems", function()
+		RunConsoleCommand( "StemController_randomize_stems" )
 	end )
 
 	-- Initial setup
-	hookAdd("InitPostEntity", "GTAMusic_Initial", function()
+	hookAdd("InitPostEntity", "StemController_Initial", function()
 		LoadMusicData() -- Load music data on client init
 		if not musicSets or table.IsEmpty(musicSets) then
-			chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
+			chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
 			surface.PlaySound("ui/error.wav")
 			return
 		end
@@ -602,12 +611,12 @@ if CLIENT then
 				ChangeMusicSet("random")
 			else
 				-- Initialize the default set
-				RunConsoleCommand("gtamusic_setname", currentSet)
+				RunConsoleCommand("StemController_setname", currentSet)
 			end
 		end)
 	end)
 
-hook.Add( "HUDPaint", "GTAMusic_DebugHUD", function()
+hook.Add( "HUDPaint", "StemController_DebugHUD", function()
     if not cvDebug:GetBool() then return end
 
     local lines = {}
@@ -710,7 +719,77 @@ hook.Add( "HUDPaint", "GTAMusic_DebugHUD", function()
     end
 end)
 
---[[ 	hookAdd( "HUDPaint", "GTAMusic_DebugHUD", function()
+local function FormatVolume(vol)
+    if math.abs(vol) < 0.001 then return "0" end  -- Handle zero
+    local rounded = math.Round(vol, 2)  -- Round to 2 decimal places for precision
+    if rounded == math.floor(rounded) then return tostring(math.floor(rounded)) end  -- Whole number
+    local singleDecimal = math.Round(rounded * 10) / 10  -- Check for single decimal
+    if singleDecimal == rounded then return string.format("%.1f", rounded) end  -- Single decimal
+    return string.format("%.2f", rounded)  -- Two decimals
+end
+
+-- HUD visualization for stem volume fade progress
+hookAdd("HUDPaint", "StemController_VolumeVisualizer", function()
+	if not cvDebug:GetBool() then return end
+    local musicVolume = cvMusicVolume:GetFloat()
+    if musicVolume <= 0 then return end  -- No visualization if volume is 0
+
+    local fadeTime = cvFadeTime:GetFloat()
+    local barWidth = 250
+    local barHeight = 20
+    local spacing = 10  -- Space between bars
+    local startX = 50
+    local startY = 650
+    local padding = 10  -- Padding for shadow box
+
+    -- Count active stems to determine shadow box size
+    local activeStems = 0
+    for stem, channel in pairs(currentStems) do
+        if IsValid(channel) and stemVolumes[stem] then
+            activeStems = activeStems + 1
+        end
+    end
+
+    -- Draw shadow box if there are active stems
+    if activeStems > 0 then
+        local boxHeight = activeStems * barHeight + (activeStems - 1) * spacing + 2 * padding
+        surface.SetDrawColor(0, 0, 0, 150)  -- Semi-transparent black shadow box
+        surface.DrawRect(startX - padding, startY - padding, barWidth + 2 * padding, boxHeight)
+    end
+
+    -- Draw progress bars
+    for stem, channel in pairs(currentStems) do
+        if IsValid(channel) and stemVolumes[stem] then
+            local currentVol = stemVolumes[stem] or 0
+            local baseMult = stemBaseVolumeMultipliers[stem] or 1
+            local maxVol = musicVolume * baseMult  -- Maximum volume for this stem
+            local progress = maxVol > 0 and math.Clamp(currentVol / maxVol, 0, 1) or 0
+
+            -- Draw background bar
+            surface.SetDrawColor(50, 50, 50, 200)  -- Dark gray background
+            surface.DrawRect(startX, startY, barWidth, barHeight)
+
+            -- Draw progress bar
+            surface.SetDrawColor(30, 150, 36)  -- Green for progress
+            surface.DrawRect(startX, startY, barWidth * progress, barHeight)
+
+            -- Format volume using custom function
+            local currentVolStr = FormatVolume( currentVol )
+            local maxVolStr = FormatVolume( maxVol )
+
+            -- Draw stem label with fade time
+            surface.SetTextColor( 255, 255, 255, 255 )
+            surface.SetFont( "DermaDefault" )
+            surface.SetTextPos( startX + 5, startY + 2 )
+            surface.DrawText( "Stem " .. stem .. " Volume: " .. currentVolStr .. " / " .. maxVolStr .. " | Fade: " .. string.format( "%.2f", fadeTime ) .. "s" )
+
+            -- Move to next bar position
+            startY = startY + barHeight + spacing
+        end
+    end
+end)
+
+--[[ 	hookAdd( "HUDPaint", "StemController_DebugHUD", function()
 			if not cvDebug:GetBool() then return end
 
 			local lines = {}
@@ -757,7 +836,7 @@ end)
 
 	-- Function to populate DListView
 	local function PopulateSetList()
-		GTAMusicMenu.setList:Clear()
+		StemControllerMenu.setList:Clear()
 		local categories = {}
 		local sortedSets = {}
 		for set, data in pairs(musicSets) do
@@ -792,7 +871,7 @@ end)
 		for _, entry in ipairs(sortedSets) do
 			if not addedGames[entry.game] then
 				expandedCategories[entry.game] = expandedCategories[entry.game] or {}
-				local header = GTAMusicMenu.setList:AddLine("")
+				local header = StemControllerMenu.setList:AddLine("")
 				header.IsHeader = true
 				header.Paint = function(self, w, h)
 					draw.RoundedBox(4, 0, 0, w, h, Color(50, 50, 50, 255))
@@ -806,7 +885,7 @@ end)
 				if expandedCategories[entry.game][entry.category] == nil then
 					expandedCategories[entry.game][entry.category] = false
 				end
-				local header = GTAMusicMenu.setList:AddLine("")
+				local header = StemControllerMenu.setList:AddLine("")
 				header.IsHeader = true
 				header.IsCategory = true
 				header.Game = entry.game
@@ -821,11 +900,11 @@ end)
 					if code == MOUSE_LEFT then
 						expandedCategories[entry.game][entry.category] = not expandedCategories[entry.game][entry.category]
 						local selectedSet = currentSet
-						if IsValid(GTAMusicMenu.setList) then
+						if IsValid(StemControllerMenu.setList) then
 							PopulateSetList()
-							for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
+							for _, line in ipairs(StemControllerMenu.setList:GetLines()) do
 								if line.set == selectedSet then
-									GTAMusicMenu.setList:SelectItem(line)
+									StemControllerMenu.setList:SelectItem(line)
 									break
 								end
 							end
@@ -836,7 +915,7 @@ end)
 			end
 			if entry.category == "" or expandedCategories[entry.game][entry.category] then
 				local indent = entry.category == "" and "  " or "    "
-				local line = GTAMusicMenu.setList:AddLine(indent .. entry.name)
+				local line = StemControllerMenu.setList:AddLine(indent .. entry.name)
 				line.set = entry.set
 				line.Paint = function(self, w, h)
 					local bgColor = self:IsHovered() and Color(100, 100, 100, 255) or (self:IsSelected() and Color(80, 80, 80, 255) or Color(60, 60, 60, 255))
@@ -850,13 +929,13 @@ end)
 			end
 		end
 		if selectedLine then
-			GTAMusicMenu.setList:SelectItem(selectedLine)
+			StemControllerMenu.setList:SelectItem(selectedLine)
 		end
 	end
 
-	concommandAdd("gtamusic_menu", function()
+	concommandAdd("StemController_menu", function()
 		if not musicSets or table.IsEmpty(musicSets) then
-			chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
+			chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: No music sets available, check music_data.lua")
 			surface.PlaySound("ui/error.wav")
 			return
 		end
@@ -864,7 +943,7 @@ end)
 		local frame = vguiCreate("DFrame")
 		frame:SetSize(450, 710)
 		frame:Center()
-		frame:SetTitle("GTA Music Controller")
+		frame:SetTitle("Stem Controller Main Menu")
 		frame:SetDraggable(true)
 		frame:ShowCloseButton(true)
 		frame:MakePopup()
@@ -881,21 +960,21 @@ end)
 		setLabel:SetColor(Color(255, 255, 255))
 		setLabel:SizeToContents()
 
-		GTAMusicMenu.setList = vguiCreate("DListView", frame)
-		GTAMusicMenu.setList:SetPos(10, 50)
-		GTAMusicMenu.setList:SetSize(430, 150)
-		GTAMusicMenu.setList:AddColumn("Music Set")
-		GTAMusicMenu.setList:SetMultiSelect(false)
-		GTAMusicMenu.setList.Paint = function(self, w, h)
+		StemControllerMenu.setList = vguiCreate("DListView", frame)
+		StemControllerMenu.setList:SetPos(10, 50)
+		StemControllerMenu.setList:SetSize(430, 150)
+		StemControllerMenu.setList:AddColumn("Music Set")
+		StemControllerMenu.setList:SetMultiSelect(false)
+		StemControllerMenu.setList.Paint = function(self, w, h)
 			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
-		GTAMusicMenu.setList.VBar.Paint = function() end
-		GTAMusicMenu.setList.VBar.btnUp.Paint = function() end
-		GTAMusicMenu.setList.VBar.btnDown.Paint = function() end
-		GTAMusicMenu.setList.VBar.btnGrip.Paint = function(self, w, h)
+		StemControllerMenu.setList.VBar.Paint = function() end
+		StemControllerMenu.setList.VBar.btnUp.Paint = function() end
+		StemControllerMenu.setList.VBar.btnDown.Paint = function() end
+		StemControllerMenu.setList.VBar.btnGrip.Paint = function(self, w, h)
 			draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
 		end
-		GTAMusicMenu.setList.OnRowSelected = function(_, _, row)
+		StemControllerMenu.setList.OnRowSelected = function(_, _, row)
 			if not row.IsHeader and row.set ~= currentSet then
 				ChangeMusicSet("next", row.set)
 				--surface.PlaySound("ui/blip.wav")
@@ -930,10 +1009,10 @@ end)
 		end
 		CreateStyledButton(buttonPanel, 5, 5, 140, 30, "Random Set", function() ChangeMusicSet( "random" ) end)
 		CreateStyledButton(buttonPanel, 150, 5, 140, 30, "Random in Cat.", function() ChangeMusicSet( "same_category" ) end)
-		CreateStyledButton(buttonPanel, 295, 5, 135, 30, "Reload Data", function() frame:Close() RunConsoleCommand( "gtamusic_reload_data") RunConsoleCommand( "gtamusic_menu" ) end)
-		CreateStyledButton(buttonPanel, 5, 35, 140, 30, "Stem Controller", function() frame:Close() RunConsoleCommand("gtamusic_stemmenu") end)
-		CreateStyledButton(buttonPanel, 150, 35, 140, 30, "Randomize Stems", function() RunConsoleCommand("gtamusic_randomize_stems") end)
-		CreateStyledButton(buttonPanel, 295, 35, 135, 30, "Stop Music", function() RunConsoleCommand("gtamusic_stop") end)
+		CreateStyledButton(buttonPanel, 295, 5, 135, 30, "Reload Data", function() frame:Close() RunConsoleCommand( "StemController_reload_data") RunConsoleCommand( "StemController_menu" ) end)
+		CreateStyledButton(buttonPanel, 5, 35, 140, 30, "Stem Controller", function() frame:Close() RunConsoleCommand("StemController_stemmenu") end)
+		CreateStyledButton(buttonPanel, 150, 35, 140, 30, "Randomize Stems", function() RunConsoleCommand("StemController_randomize_stems") end)
+		CreateStyledButton(buttonPanel, 295, 35, 135, 30, "Stop Music", function() RunConsoleCommand("StemController_stop") end)
 
 		-- Settings panel
 		local settingsPanel = vguiCreate("DPanel", frame)
@@ -957,7 +1036,7 @@ end)
 		volumeSlider:SetMin(0)
 		volumeSlider:SetMax(1)
 		volumeSlider:SetDecimals(2)
-		volumeSlider:SetConVar("gtamusic_volume")
+		volumeSlider:SetConVar("StemController_volume")
 		volumeSlider:SetValue(cvMusicVolume:GetFloat())
 
 		local fadeSlider = vguiCreate("DNumSlider", settingsPanel)
@@ -967,7 +1046,7 @@ end)
 		fadeSlider:SetMin(0)
 		fadeSlider:SetMax(10)
 		fadeSlider:SetDecimals(1)
-		fadeSlider:SetConVar("gtamusic_fadetime")
+		fadeSlider:SetConVar("StemController_fadetime")
 		fadeSlider:SetValue(cvFadeTime:GetFloat())
 
 		local playbackSlider = vguiCreate("DNumSlider", settingsPanel)
@@ -977,7 +1056,7 @@ end)
 		playbackSlider:SetMin(0.5)
 		playbackSlider:SetMax(2.0)
 		playbackSlider:SetDecimals(2)
-		playbackSlider:SetConVar("gtamusic_playbackrate")
+		playbackSlider:SetConVar("StemController_playbackrate")
 		playbackSlider:SetValue(cvPlaybackRate:GetFloat())
 
 		local randomSetCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
@@ -985,7 +1064,7 @@ end)
 		randomSetCheck:SetText("Random Set on Spawn")
 		randomSetCheck:SetFont("DermaDefault")
 		randomSetCheck:SetTextColor(Color(255, 255, 255))
-		randomSetCheck:SetConVar("gtamusic_randomset")
+		randomSetCheck:SetConVar("StemController_randomset")
 		randomSetCheck:SizeToContents()
 
 		local randomIntensityCheck = vguiCreate("DCheckBoxLabel", settingsPanel)
@@ -993,7 +1072,7 @@ end)
 		randomIntensityCheck:SetText("Enable Intensity Changing Sequences")
 		randomIntensityCheck:SetFont("DermaDefault")
 		randomIntensityCheck:SetTextColor(Color(255, 255, 255))
-		randomIntensityCheck:SetConVar("gtamusic_intensitysequences")
+		randomIntensityCheck:SetConVar("StemController_intensitysequences")
 		randomIntensityCheck:SizeToContents()
 
 		-- Info panel
@@ -1004,19 +1083,19 @@ end)
 			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
 
-		GTAMusicMenu.infoLabel = vguiCreate("DLabel", infoPanel)
-		GTAMusicMenu.infoLabel:SetPos(5, 5)
-		GTAMusicMenu.infoLabel:SetSize(420, 90)
-		GTAMusicMenu.infoLabel:SetWrap(true)
-		GTAMusicMenu.infoLabel:SetFont("DermaDefault")
-		GTAMusicMenu.infoLabel:SetColor(Color(255, 255, 255))
+		StemControllerMenu.infoLabel = vguiCreate("DLabel", infoPanel)
+		StemControllerMenu.infoLabel:SetPos(5, 5)
+		StemControllerMenu.infoLabel:SetSize(420, 90)
+		StemControllerMenu.infoLabel:SetWrap(true)
+		StemControllerMenu.infoLabel:SetFont("DermaDefault")
+		StemControllerMenu.infoLabel:SetColor(Color(255, 255, 255))
 
-		function GTAMusicMenu.UpdateInfo()
-			if not IsValid(GTAMusicMenu.infoLabel) then return end
+		function StemControllerMenu.UpdateInfo()
+			if not IsValid(StemControllerMenu.infoLabel) then return end
 			local data = musicSets[currentSet] or { name = currentSet or "None", gameOrigin = "Unknown", composer = "Unknown", category = "Unknown" }
 			local intensities = musicSets[currentSet] and musicSets[currentSet].intensity or {}
 			local intensityList = table.concat(table.GetKeys(intensities), ", ")
-			GTAMusicMenu.infoLabel:SetText(
+			StemControllerMenu.infoLabel:SetText(
 				"Track: " .. data.name ..
 				"\nGame: " .. data.gameOrigin ..
 				"\nCategory: " .. (data.category or "Unknown") ..
@@ -1024,7 +1103,7 @@ end)
 				"\nIntensities: " .. (intensityList ~= "" and intensityList or "None")
 			)
 		end
-		GTAMusicMenu.UpdateInfo()
+		StemControllerMenu.UpdateInfo()
 
 		-- Intensity selection
 		local intensityLabel = vguiCreate("DLabel", frame)
@@ -1034,13 +1113,13 @@ end)
 		intensityLabel:SetColor(Color(255, 255, 255))
 		intensityLabel:SizeToContents()
 
-		GTAMusicMenu.intensityPanel = vguiCreate("DScrollPanel", frame)
-		GTAMusicMenu.intensityPanel:SetPos(10, 580)
-		GTAMusicMenu.intensityPanel:SetSize(430, 120)
-		GTAMusicMenu.intensityPanel.Paint = function(self, w, h)
+		StemControllerMenu.intensityPanel = vguiCreate("DScrollPanel", frame)
+		StemControllerMenu.intensityPanel:SetPos(10, 580)
+		StemControllerMenu.intensityPanel:SetSize(430, 120)
+		StemControllerMenu.intensityPanel.Paint = function(self, w, h)
 			draw.RoundedBox(4, 0, 0, w, h, Color(35, 35, 35, 255))
 		end
-		local scrollBar = GTAMusicMenu.intensityPanel:GetVBar()
+		local scrollBar = StemControllerMenu.intensityPanel:GetVBar()
 		scrollBar.Paint = function() end
 		scrollBar.btnUp.Paint = function() end
 		scrollBar.btnDown.Paint = function() end
@@ -1048,13 +1127,13 @@ end)
 			draw.RoundedBox(4, 2, 0, w - 4, h, Color(75, 75, 75, 255))
 		end
 
-		GTAMusicMenu.intensityButtons = {}
-		function GTAMusicMenu.UpdateIntensityList()
-			if not IsValid(GTAMusicMenu.intensityPanel) then return end
-			for _, btn in pairs(GTAMusicMenu.intensityButtons) do
+		StemControllerMenu.intensityButtons = {}
+		function StemControllerMenu.UpdateIntensityList()
+			if not IsValid(StemControllerMenu.intensityPanel) then return end
+			for _, btn in pairs(StemControllerMenu.intensityButtons) do
 				if IsValid(btn) then btn:Remove() end
 			end
-			GTAMusicMenu.intensityButtons = {}
+			StemControllerMenu.intensityButtons = {}
 			if musicSets[currentSet] and musicSets[currentSet].intensity then
 				-- Define the fixed order for standard intensities
 				local fixedOrder = {"low", "medium", "high", "extreme"}
@@ -1088,24 +1167,24 @@ end)
 					local row = math.floor((i - 1) / buttonsPerRow)
 					local col = (i - 1) % buttonsPerRow
 					local xPos = 5 + col * (buttonWidth + 5)
-					GTAMusicMenu.intensityButtons[#GTAMusicMenu.intensityButtons + 1] = CreateStyledButton(
-						GTAMusicMenu.intensityPanel, xPos, yPos + row * (buttonHeight + 5), buttonWidth, buttonHeight, intensity,
-						function() RunConsoleCommand("gtamusic_triggerintensity", intensity) end
+					StemControllerMenu.intensityButtons[#StemControllerMenu.intensityButtons + 1] = CreateStyledButton(
+						StemControllerMenu.intensityPanel, xPos, yPos + row * (buttonHeight + 5), buttonWidth, buttonHeight, intensity,
+						function() RunConsoleCommand("StemController_triggerintensity", intensity) end
 					)
 				end
-				GTAMusicMenu.intensityPanel:GetCanvas():SetTall(yPos + rows * (buttonHeight + 5) + 5)
+				StemControllerMenu.intensityPanel:GetCanvas():SetTall(yPos + rows * (buttonHeight + 5) + 5)
 			end
-			if IsValid(GTAMusicMenu.infoLabel) then
-				GTAMusicMenu.UpdateInfo()
+			if IsValid(StemControllerMenu.infoLabel) then
+				StemControllerMenu.UpdateInfo()
 			end
 		end
-		GTAMusicMenu.UpdateIntensityList()
+		StemControllerMenu.UpdateIntensityList()
 	end)
 
 	-- Stem control menu
-	concommandAdd( "gtamusic_stemmenu", function()
+	concommandAdd( "StemController_stemmenu", function()
 		if not musicSets or table.IsEmpty( musicSets ) then
-			chat.AddText( Color( 93, 182, 229 ), "[GTAMusic] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
+			chat.AddText( Color( 93, 182, 229 ), "[StemController] ", Color( 255, 255, 255 ), "Error: No music sets available, check music_data.lua" )
 			surface.PlaySound( "ui/error.wav" )
 			return
 		end
@@ -1115,7 +1194,7 @@ end)
 		local frame = vguiCreate( "DFrame" )
 		frame:SetSize( 350, frameHeight )
 		frame:Center()
-		frame:SetTitle( "GTA Music Stem Controller" )
+		frame:SetTitle( "Stem Menu" )
 		frame:SetDraggable( true )
 		frame:ShowCloseButton( true )
 		frame:MakePopup()
@@ -1125,7 +1204,7 @@ end)
 		end
 
 		frame.OnClose = function()
-			hookRemove( "Think", "GTAMusic_UpdateStemButtonColors" )
+			hookRemove( "Think", "StemController_UpdateStemButtonColors" )
 		end
 
 		local stemLabel = vguiCreate( "DLabel", frame )
@@ -1145,21 +1224,21 @@ end)
 			local yPos = 50
 			for i = 1, stemCount do
 				stemButtons[ i ] = CreateStyledButton( frame, 10, yPos, 330, 30, "Stem " .. i,
-					function() RunConsoleCommand( "gtamusic_triggerstem", i ) end, true, i )
+					function() RunConsoleCommand( "StemController_triggerstem", i ) end, true, i )
 				yPos = yPos + 35
 			end
 
-			CreateStyledButton( frame, 10, yPos + 15, 330, 30, "Clear Stems", function() RunConsoleCommand( "gtamusic_stop" ) end )
-			CreateStyledButton( frame, 10, yPos + 50, 330, 30, "Randomize Stems (2-4)", function() RunConsoleCommand( "gtamusic_randomize_stems" ) end )
+			CreateStyledButton( frame, 10, yPos + 15, 330, 30, "Clear Stems", function() RunConsoleCommand( "StemController_stop" ) end )
+			CreateStyledButton( frame, 10, yPos + 50, 330, 30, "Randomize Stems (2-4)", function() RunConsoleCommand( "StemController_randomize_stems" ) end )
 			CreateStyledButton( frame, 10, yPos + 85, 330, 30, "Go Back to Score Menu", function()
 				frame:Close()
-				RunConsoleCommand( "gtamusic_menu" )
+				RunConsoleCommand( "StemController_menu" )
 			end )
 		end
 		UpdateStemButtons()
 
-		hookAdd( "OnConVarChanged", "GTAMusic_UpdateStemButtons", function( name, _, newVal )
-			if name == "gtamusic_setname" then
+		hookAdd( "OnConVarChanged", "StemController_UpdateStemButtons", function( name, _, newVal )
+			if name == "StemController_setname" then
 				if IsValid( stemLabel ) then
 					stemLabel:SetText( "Toggle Stems for " .. ( musicSets[ currentSet ] and musicSets[ currentSet ].name or currentSet ) .. ":" )
 					stemLabel:SizeToContents()
@@ -1174,9 +1253,9 @@ end)
 			end
 		end )
 
-		hookAdd( "Think", "GTAMusic_UpdateStemButtonColors", function()
+		hookAdd( "Think", "StemController_UpdateStemButtonColors", function()
 			if not IsValid( frame ) then
-				hookRemove( "Think", "GTAMusic_UpdateStemButtonColors" )
+				hookRemove( "Think", "StemController_UpdateStemButtonColors" )
 				return
 			end
 			for i, btn in ipairs( stemButtons ) do
@@ -1195,7 +1274,7 @@ end)
 end
 
 -- Convar callbacks
-cvarsAddChangeCallback( "gtamusic_volume", function( _, _, newVal )
+cvarsAddChangeCallback( "StemController_volume", function( _, _, newVal )
 	local vol = tonumber( newVal ) or 0.6
 	for stem, active in pairs( stemStates ) do
 		if active then
@@ -1203,17 +1282,17 @@ cvarsAddChangeCallback( "gtamusic_volume", function( _, _, newVal )
 		end
 	end
 	if SERVER then
-		net.Start( "GTAMusic_Volume" )
+		net.Start( "StemController_Volume" )
 		net.WriteFloat( vol )
 		net.Broadcast()
 	end
 end )
 
-cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
+cvarsAddChangeCallback("StemController_setname", function(_, _, newVal)
     local set = newVal or "alc_vodka"
     if not musicSets or table.IsEmpty(musicSets) then
         if CLIENT then
-            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: No music sets available")
+            chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: No music sets available")
             surface.PlaySound("ui/error.wav")
         end
         DebugPrint("Error: No music sets available in musicSets")
@@ -1222,7 +1301,7 @@ cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
     end
     if not musicSets[set] then
         if CLIENT then
-            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Error: Invalid music set:", Color(240, 200, 80), set)
+            chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Error: Invalid music set:", Color(240, 200, 80), set)
             surface.PlaySound("ui/error.wav")
         end
         DebugPrint("Invalid set selected:", set)
@@ -1232,12 +1311,12 @@ cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
 
     -- Store the user's current fade time and set to 1 second for set change
     local originalFadeTime = cvFadeTime:GetFloat()
-    RunConsoleCommand("gtamusic_fadetime", "1")
+    RunConsoleCommand("StemController_fadetime", "1")
 
     timerSimple(0.1, function()
-        RunConsoleCommand("gtamusic_stop")
+        RunConsoleCommand("StemController_stop")
         if CLIENT then
-            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Stopping Stems. Do not trigger any stems until next track is loaded!")
+            chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Stopping Stems. Do not trigger any stems until next track is loaded!")
             surface.PlaySound("ui/blip.wav")
         end
     end)
@@ -1248,28 +1327,28 @@ cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
             StartStems(set)
         end
         -- Restore the user's original fade time
-        RunConsoleCommand("gtamusic_fadetime", tostring(originalFadeTime))
+        RunConsoleCommand("StemController_fadetime", tostring(originalFadeTime))
         if CLIENT then
-            chat.AddText(Color(93, 182, 229), "[GTAMusic] ", Color(255, 255, 255), "Music Set ", Color(240, 200, 80), set, Color(255, 255, 255), " is loaded")
+            chat.AddText(Color(93, 182, 229), "[StemController] ", Color(255, 255, 255), "Music Set ", Color(240, 200, 80), set, Color(255, 255, 255), " is loaded")
             surface.PlaySound("ui/0x0E60F7B2.wav")
-            if GTAMusicMenu.UpdateInfo then
-                GTAMusicMenu.UpdateInfo()
+            if StemControllerMenu.UpdateInfo then
+                StemControllerMenu.UpdateInfo()
             end
-            if IsValid(GTAMusicMenu.setList) then
-                for _, line in ipairs(GTAMusicMenu.setList:GetLines()) do
+            if IsValid(StemControllerMenu.setList) then
+                for _, line in ipairs(StemControllerMenu.setList:GetLines()) do
                     if line.set == set then
-                        GTAMusicMenu.setList:SelectItem(line)
+                        StemControllerMenu.setList:SelectItem(line)
                         break
                     end
                 end
             end
-            if GTAMusicMenu.UpdateIntensityList then
-                GTAMusicMenu.UpdateIntensityList()
+            if StemControllerMenu.UpdateIntensityList then
+                StemControllerMenu.UpdateIntensityList()
             end
         end
         DebugPrint("Switched to set:", set)
         if SERVER then
-            net.Start("GTAMusic_SetSet")
+            net.Start("StemController_SetSet")
             net.WriteString(set)
             net.Broadcast()
         end
@@ -1277,58 +1356,58 @@ cvarsAddChangeCallback("gtamusic_setname", function(_, _, newVal)
     end)
 end)
 
-cvarsAddChangeCallback( "gtamusic_randomize_intensity", function( _, _, newVal )
+cvarsAddChangeCallback( "StemController_randomize_intensity", function( _, _, newVal )
 	if tonumber( newVal ) == 1 and currentIntensity and musicSets[ currentSet ] and musicSets[ currentSet ].intensity then
 		local interval = mathRandom( 30, 45 )
 		nextIntensityTime = CurTime() + interval
-		timerCreate( "GTAMusic_Randomize_Intensity", interval, 0, function()
+		timerCreate( "StemController_Randomize_Intensity", interval, 0, function()
 			if currentIntensity and musicSets[ currentSet ] and musicSets[ currentSet ].intensity and musicSets[ currentSet ].intensity[ currentIntensity ] then
 				TriggerIntensity( currentIntensity )
 			end
 		end )
 	else
-		timerRemove( "GTAMusic_Randomize_Intensity" )
+		timerRemove( "StemController_Randomize_Intensity" )
 		nextIntensityTime = 0
 	end
 end )
 
 -- Console commands
-concommandAdd( "gtamusic_triggerstem", function( ply, _, args )
+concommandAdd( "StemController_triggerstem", function( ply, _, args )
 	local stem = tonumber( args[ 1 ] )
 	local maxStems = musicSets[ currentSet ] and #musicSets[ currentSet ].stems or MAX_STEMS
 	if not stem or stem < 1 or stem > maxStems then
 		if IsValid( ply ) then
-			ply:PrintMessage( HUD_PRINTTALK, "[GTAMusic] Invalid stem number (1-" .. maxStems .. ")" )
+			ply:PrintMessage( HUD_PRINTTALK, "[StemController] Invalid stem number (1-" .. maxStems .. ")" )
 		end
 		return
 	end
 	TriggerStem( stem )
 	if SERVER then
-		net.Start( "GTAMusic_TriggerStem" )
+		net.Start( "StemController_TriggerStem" )
 		net.WriteUInt( stem, 4 )
 		net.Broadcast()
 	end
 end )
 
-concommandAdd( "gtamusic_triggerintensity", function( ply, _, args )
+concommandAdd( "StemController_triggerintensity", function( ply, _, args )
 	local intensity = args[ 1 ] and args[ 1 ]:lower()
 	local validIntensities = musicSets[ currentSet ] and musicSets[ currentSet ].intensity or {}
 	if not intensity or not validIntensities[ intensity ] then
 		if IsValid( ply ) then
 			local intensityList = tableConcat( tableGetKeys( validIntensities ), ", " )
-			ply:PrintMessage( HUD_PRINTTALK, "[GTAMusic] Invalid intensity (valid: " .. ( intensityList ~= "" and intensityList or "none" ) .. ")" )
+			ply:PrintMessage( HUD_PRINTTALK, "[StemController] Invalid intensity (valid: " .. ( intensityList ~= "" and intensityList or "none" ) .. ")" )
 		end
 		return
 	end
 	TriggerIntensity( intensity )
 	if SERVER then
-		net.Start( "GTAMusic_TriggerIntensity" )
+		net.Start( "StemController_TriggerIntensity" )
 		net.WriteString( intensity )
 		net.Broadcast()
 	end
 end )
 
-concommandAdd( "gtamusic_stop", function( ply )
+concommandAdd( "StemController_stop", function( ply )
 	local anyActive = false
 	local maxStems = musicSets[ currentSet ] and #musicSets[ currentSet ].stems or MAX_STEMS
 	for i = 1, maxStems do
@@ -1343,35 +1422,35 @@ concommandAdd( "gtamusic_stop", function( ply )
 		DebugPrint( "No active stems to stop" )
 	end
 	currentIntensity = nil
-	timerRemove( "GTAMusic_Randomize_Intensity" )
+	timerRemove( "StemController_Randomize_Intensity" )
 	nextIntensityTime = 0
 	if SERVER then
-		net.Start( "GTAMusic_Stop" )
+		net.Start( "StemController_Stop" )
 		net.Broadcast()
 	end
 end )
 
-concommandAdd( "gtamusic_randomize_stems", function( ply )
+concommandAdd( "StemController_randomize_stems", function( ply )
 	RandomizeStems()
 	if SERVER then
-		net.Start( "GTAMusic_Randomize_Stems" )
+		net.Start( "StemController_Randomize_Stems" )
 		net.Broadcast()
 	end
 --	if IsValid( ply ) then
---		ply:PrintMessage( HUD_PRINTTALK, "[GTAMusic] Randomized stems (2-4)" )
+--		ply:PrintMessage( HUD_PRINTTALK, "[StemController] Randomized stems (2-4)" )
 --	end
 end )
 
-concommandAdd( "gtamusic_randomize_musicset", function( ply )
+concommandAdd( "StemController_randomize_musicset", function( ply )
 	ChangeMusicSet( "random" )
 	if SERVER and IsValid( ply ) then
-		ply:PrintMessage( HUD_PRINTTALK, "[GTAMusic] Randomized music set" )
+		ply:PrintMessage( HUD_PRINTTALK, "[StemController] Randomized music set" )
 	end
 end )
 
-concommandAdd( "gtamusic_reload_data", function( ply )
+concommandAdd( "StemController_reload_data", function( ply )
 	ReloadMusicData()
 	if SERVER and IsValid( ply ) then
-		ply:PrintMessage( HUD_PRINTTALK, "[GTAMusic] Music data reload triggered" )
+		ply:PrintMessage( HUD_PRINTTALK, "[StemController] Music data reload triggered" )
 	end
 end )

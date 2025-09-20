@@ -70,7 +70,6 @@ local musicSets = {
 			"NRT_SONG_04_7.mp3",
 			"NRT_SONG_04_8.mp3"
 		},
-
 		intensity = {
 			low = { { 1, 2 }, { 2 } },
 			medium = { { 1, 2, 3 }, { 1, 2, 3, 4 }, { 1, 2, 3, 7 }, { 1, 2, 3, 4, 7 } },

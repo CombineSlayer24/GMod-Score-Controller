@@ -129,6 +129,9 @@ local musicSets = {
 			"SMUGGLER_TRACK_SMTB1_5.mp3",
 			"SMUGGLER_TRACK_SMTB1_6.mp3"
 		},
+		stemVolumeAdjustment = {
+			[ 1 ] = -4,  -- STEM 1: -4 dB quieter
+		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 2, 5 } },
 			medium = { { 1, 2, 3 }, { 1, 3, 4 }, { 2, 4, 5 } },

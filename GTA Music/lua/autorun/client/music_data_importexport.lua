@@ -14,6 +14,13 @@ local musicSets = {
 			"DB_WOULD_LOVE_THIS_STEM_5.mp3",
 			"DB_WOULD_LOVE_THIS_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 }, { 1, 3, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 
 	east_of_all = {
@@ -30,6 +37,13 @@ local musicSets = {
 			"EAST_OF_ALL_STEM_5.mp3",
 			"EAST_OF_ALL_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 
 	eifel_power = {
@@ -46,6 +60,13 @@ local musicSets = {
 			"EIFEL_POWER_STEM_5.mp3",
 			"EIFEL_POWER_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 
 	gullywax = {
@@ -62,6 +83,13 @@ local musicSets = {
 			"GULLYWAX_STEM_5.mp3",
 			"GULLYWAX_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 
 	take_a_day_trip = {
@@ -78,6 +106,13 @@ local musicSets = {
 			"TAKE_A_DAY_TRIP_STEM_5.mp3",
 			"TAKE_A_DAY_TRIP_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 2, 3, 5 }, { 2, 3, 4, 5 } },
+			high = { { 2, 3, 5, 6 }, { 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 
 	tundra = {
@@ -94,6 +129,13 @@ local musicSets = {
 			"TUNDRA_STEM_5.mp3",
 			"TUNDRA_STEM_6.mp3"
 		},
+		intensity = {
+			low = { 1, 2 },
+			medium = { { 1, 2, 3, 5 }, { 1, 2, 3, 4, 5 } },
+			high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+			extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+			cooldown = { 2, 5 }
+		}
 	},
 }
 

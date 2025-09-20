@@ -16,6 +16,13 @@ local musicSets = {
 			"alc_electrocutioners_7.mp3",
 			"alc_electrocutioners_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 5 } },
+			medium = { { 1, 2, 3, 4, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 2, 6, 8 }, { 1, 2, 4, 6 } },
+			high = { { 1, 3, 4, 5, 6, 7 }, { 1, 2, 3, 4, 6 }, { 1, 2, 4, 6, 7 } },
+			extreme = { { 1, 2, 3, 4, 5, 6, 7 }, { 1, 2, 4, 6, 7, 8 } },
+			cooldown = { 2, 6 }
+		}
 	},
 
 	alc_mission_eight = {
@@ -34,6 +41,13 @@ local musicSets = {
 			"alc_mission_eight_7.mp3",
 			"alc_mission_eight_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 2 }, { 2, 3 }, { 2 } },
+			medium = { { 2, 3, 4, 6 }, { 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 }, { 1, 2, 4, 6 } },
+			high = { { 2, 3, 4, 5, 6, 7 }, { 1, 2, 4, 6, 7 }, { 2, 3, 4, 6 } },
+			extreme = { { 2, 3, 4, 5, 6, 7 }, { 1, 2, 4, 6, 7, 8 } },
+			cooldown = { 1, 6 }
+		}
 	},
 
 	alc_no_no = {
@@ -52,6 +66,13 @@ local musicSets = {
 			"alc_no_no_7.mp3",
 			"alc_no_no_8.mp3"
 		},
+		intensity = {
+			low = { { 1, 3 }, { 1, 3, 8 }, { 1, 8 } },
+			medium = { { 1, 3, 4 }, { 1, 3, 4, 5 }, { 1, 4, 8 } },
+			high = { { 1, 3, 4, 7 }, { 1, 3, 4, 5, 7 }, { 1, 4, 7, 8 } },
+			extreme = { { 1, 3, 4, 5, 7, 8 }, { 1, 3, 4, 7, 8 }, { 1, 4, 5, 7 } },
+			cooldown = { 4, 6 }
+		}
 	},
 
 	dlc_security_back_home = {
@@ -70,6 +91,16 @@ local musicSets = {
 			"dlc_security_back_home_7.mp3",
 			"dlc_security_back_home_8.mp3",
 		},
+		stemVolumeAdjustment = {
+			[ 4 ] = -10,  -- STEM 4: -10 dB quieter
+		},
+		intensity = {
+			low = { { 1, 2, 3, 5 }, { 1, 3 }, { 1, 4 } },
+			medium = { { 1, 3, 4, 5, 6 }, { 1, 2, 3, 4, 6 } },
+			high = { { 1, 3, 7 }, { 1, 3, 4, 5, 7 }, { 2, 3, 6, 7 } },
+			extreme = { { 1, 3, 4, 6, 7, 8 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 2, 6, 7, 8 } },
+			cooldown = { 2, 6 }
+		}
 	},
 
 	dlc_security_kill_dat = {
@@ -88,6 +119,17 @@ local musicSets = {
 			"dlc_security_kill_dat_7.mp3",
 			"dlc_security_kill_dat_8.mp3",
 		},
+		stemVolumeAdjustment = {
+			[ 1 ] = -3,  -- STEM 1: -3 dB quieter
+			[ 2 ] = -5,  -- STEM 2: -5 dB quieter
+		},
+		intensity = {
+			low = { { 1, 3, 5 }, { 1, 3 }, { 1, 4 } },
+			medium = { { 3, 4, 5, 6 }, { 3, 4, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 3, 4, 6, 7 }, { 1, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 4, 6 }
+		}
 	},
 
 	dlc_security_mass = {
@@ -106,12 +148,16 @@ local musicSets = {
 			"dlc_security_mass_7.mp3",
 			"dlc_security_mass_8.mp3",
 		},
+		stemVolumeAdjustment = {
+			[ 5 ] = -4,  -- STEM 5: -4 dB quieter
+		},
 		intensity = {
-			low = { { 1 }, { 1, 2 } },
-			medium = { { 1, 3, 6 }, { 1, 4 }, { 1, 2, 3, 6, 8 } },
-			high = { { 1, 3, 6, 7 }, { 1, 3, 4, 5, 6, 7 }, { 1, 3, 5, 6, 7, 8 } },
-			extreme = { { 1, 3, 4, 5, 6, 7 }, { 1, 3, 4, 5, 6, 7, 8 }, { 1, 3, 4, 6, 7, 8 } },
-			cooldown = { 1, 5, 6 }
+			low = { { 1, 2, 3, 5 }, { 1, 3 }, { 1, 4 } },
+			medium = { { 3, 4, 5, 6 }, { 2, 3, 4, 6 } },
+			high = { { 1, 3, 7 }, { 1, 3, 4, 5, 7 }, { 2, 3, 6, 7 }, { 2, 3, 4, 6, 7 } },
+			extreme = { { 2, 3, 4, 6, 7, 8 }, { 2, 3, 4, 5, 6, 7, 8 }, { 2, 3, 6, 7, 8 } },
+			hitman = { { 1, 5 }, { 1, 4 }, { 1, 3 } },
+			cooldown = { 2, 6 }
 		}
 	},
 
@@ -131,6 +177,13 @@ local musicSets = {
 			"dlc_security_space_7.mp3",
 			"dlc_security_space_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 3, 5 }, { 1, 3 }, { 1, 4 } },
+			medium = { { 1, 3, 4, 5, 6 }, { 2, 3, 4, 6 } },
+			high = { { 3, 4, 5, 6, 7 }, { 2, 3, 4, 6, 7 }, { 1, 2, 4, 6, 7 } },
+			extreme = { { 3, 4, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 2, 4, 6 }
+		}
 	},
 
 	dlc_security_vibed = {
@@ -149,6 +202,13 @@ local musicSets = {
 			"dlc_security_vibed_7.mp3",
 			"dlc_security_vibed_8.mp3",
 		},
+		intensity = {
+			low = { { 1, 2, 3, 5 }, { 1, 3 }, { 1, 4 } },
+			medium = { { 1, 3, 4, 5, 6 }, { 2, 3, 4, 6 } },
+			high = { { 1, 3, 4, 5, 7 }, { 1, 3, 4, 6, 7 }, { 1, 4, 6, 7 } },
+			extreme = { { 3, 4, 6, 7, 8 }, { 3, 4, 5, 6, 7 } },
+			cooldown = { 4, 6 }
+		}
 	},
 }
 
