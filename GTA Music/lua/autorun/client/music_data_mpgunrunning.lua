@@ -69,6 +69,29 @@ local musicSets = {
 		}
 	},
 
+    gunrunning_track_g3 = {
+        name = "Gunrunning G3",
+        gameOrigin = "GTA: Online",
+        composer = "Oh No",
+        category = "Gunrunning Update",
+        path = "gta5/mpgunrunning/gunrunning_track_g3",
+        stems = {
+            "GUNRUNNING_GR3_1.mp3",
+            "GUNRUNNING_GR3_2.mp3",
+            "GUNRUNNING_GR3_3.mp3",
+            "GUNRUNNING_GR3_4.mp3",
+            "GUNRUNNING_GR3_5.mp3",
+            "GUNRUNNING_GR3_6.mp3"
+        },
+        intensity = {
+            low = { { 1 }, { 1, 2 } },
+            medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 2, 4, 5 } },
+            high = { { 1, 2, 3, 5, 6 }, { 1, 2, 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
+            extreme = { { 1, 2, 3, 4, 5, 6 }, { 1, 2, 3, 5, 6 } },
+            cooldown = { 1, 5 }
+        }
+    },
+
 	gunrunning_track_gr2 = {
 		name = "Gunrunning GR2",
 		gameOrigin = "GTA: Online",

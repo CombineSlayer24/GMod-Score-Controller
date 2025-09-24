@@ -7,12 +7,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_bespoke",
 		stems = {
-			"DLC_BATTLE_POWERPLAY_BESPOKE_1.mp3",
-			"DLC_BATTLE_POWERPLAY_BESPOKE_2.mp3",
-			"DLC_BATTLE_POWERPLAY_BESPOKE_3.mp3",
-			"DLC_BATTLE_POWERPLAY_BESPOKE_4.mp3",
-			"DLC_BATTLE_POWERPLAY_BESPOKE_5.mp3",
-			"DLC_BATTLE_POWERPLAY_BESPOKE_6.mp3"
+			"POWERPLAY_BESPOKE_STEM_2.mp3",
+			"POWERPLAY_BESPOKE_STEM_3.mp3",
+			"POWERPLAY_BESPOKE_STEM_4.mp3",
+			"POWERPLAY_BESPOKE_STEM_5.mp3",
+			"POWERPLAY_BESPOKE_STEM_6.mp3",
+			"POWERPLAY_BESPOKE_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
@@ -30,18 +30,18 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_carsteal",
 		stems = {
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_1.mp3",
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_2.mp3",
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_3.mp3",
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_4.mp3",
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_5.mp3",
-			"DLC_BATTLE_POWERPLAY_CARSTEAL_6.mp3"
+			"POWERPLAY_CARSTEAL_STEM_2.mp3",
+			"POWERPLAY_CARSTEAL_STEM_3.mp3",
+			"POWERPLAY_CARSTEAL_STEM_4.mp3",
+			"POWERPLAY_CARSTEAL_STEM_5.mp3",
+			"POWERPLAY_CARSTEAL_STEM_6.mp3",
+			"POWERPLAY_CARSTEAL_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 2 }, { 1, 2 }, { 2, 5 } },
 			medium = { { 1, 2, 3 }, { 2, 3, 5 }, { 1, 2, 4, 5 } },
 			high = { { 1, 3, 5, 6 }, { 1, 3, 4, 5, 6 }, { 2, 3, 5, 6 } },
-			extreme = { { 1, 3, 4, 5, 6 }, { 3, 4, 5, 6 }, { } },
+			extreme = { { 1, 3, 4, 5, 6 }, { 3, 4, 5, 6 } },
 			cooldown = { 5 }
 		}
 	},
@@ -53,12 +53,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_cliff12",
 		stems = {
-			"POWERPLAY_CLIFF12_STEM_1.mp3",
 			"POWERPLAY_CLIFF12_STEM_2.mp3",
 			"POWERPLAY_CLIFF12_STEM_3.mp3",
 			"POWERPLAY_CLIFF12_STEM_4.mp3",
 			"POWERPLAY_CLIFF12_STEM_5.mp3",
-			"POWERPLAY_CLIFF12_STEM_6.mp3"
+			"POWERPLAY_CLIFF12_STEM_6.mp3",
+			"POWERPLAY_CLIFF12_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 2 }, { 1, 2 }, { 2, 5 } },
@@ -76,19 +76,19 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_cliff18",
 		stems = {
-			"POWERPLAY_CLIFF18_STEM_1.mp3",
 			"POWERPLAY_CLIFF18_STEM_2.mp3",
 			"POWERPLAY_CLIFF18_STEM_3.mp3",
 			"POWERPLAY_CLIFF18_STEM_4.mp3",
 			"POWERPLAY_CLIFF18_STEM_5.mp3",
-			"POWERPLAY_CLIFF18_STEM_6.mp3"
+			"POWERPLAY_CLIFF18_STEM_6.mp3",
+			"POWERPLAY_CLIFF18_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
 			medium = { { 1, 2, 3 }, { 1, 3, 5 }, { 1, 4, 5 } },
 			high = { { 1, 2, 3, 5, 6 }, { 3, 4, 5, 6 }, { 1, 3, 5, 6 } },
 			extreme = { { 2, 3, 4, 5, 6 }, { 1, 2, 3, 4, 5, 6 } },
-			cooldown = { 5, 4 }
+			cooldown = { { 5 }, { 4 } },
 		}
 	},
 
@@ -99,12 +99,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_gotmove",
 		stems = {
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_1.mp3",
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_2.mp3",
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_3.mp3",
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_4.mp3",
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_5.mp3",
-			"DLC_BATTLE_POWERPLAY_GOTMOVE_6.mp3"
+			"POWERPLAY_GOTMOVE_STEM_2.mp3",
+			"POWERPLAY_GOTMOVE_STEM_3.mp3",
+			"POWERPLAY_GOTMOVE_STEM_4.mp3",
+			"POWERPLAY_GOTMOVE_STEM_5.mp3",
+			"POWERPLAY_GOTMOVE_STEM_6.mp3",
+			"POWERPLAY_GOTMOVE_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
@@ -122,12 +122,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_popo",
 		stems = {
-			"DLC_BATTLE_POWERPLAY_POPO_1.mp3",
-			"DLC_BATTLE_POWERPLAY_POPO_2.mp3",
-			"DLC_BATTLE_POWERPLAY_POPO_3.mp3",
-			"DLC_BATTLE_POWERPLAY_POPO_4.mp3",
-			"DLC_BATTLE_POWERPLAY_POPO_5.mp3",
-			"DLC_BATTLE_POWERPLAY_POPO_6.mp3"
+			"POWERPLAY_POPO_STEM_2.mp3",
+			"POWERPLAY_POPO_STEM_3.mp3",
+			"POWERPLAY_POPO_STEM_4.mp3",
+			"POWERPLAY_POPO_STEM_5.mp3",
+			"POWERPLAY_POPO_STEM_6.mp3",
+			"POWERPLAY_POPO_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
@@ -145,12 +145,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_psycho",
 		stems = {
-			"DLC_BATTLE_POWERPLAY_PSYCHO_1.mp3",
-			"DLC_BATTLE_POWERPLAY_PSYCHO_2.mp3",
-			"DLC_BATTLE_POWERPLAY_PSYCHO_3.mp3",
-			"DLC_BATTLE_POWERPLAY_PSYCHO_4.mp3",
-			"DLC_BATTLE_POWERPLAY_PSYCHO_5.mp3",
-			"DLC_BATTLE_POWERPLAY_PSYCHO_6.mp3"
+			"POWERPLAY_PSYCHO_STEM_2.mp3",
+			"POWERPLAY_PSYCHO_STEM_3.mp3",
+			"POWERPLAY_PSYCHO_STEM_4.mp3",
+			"POWERPLAY_PSYCHO_STEM_5.mp3",
+			"POWERPLAY_PSYCHO_STEM_6.mp3",
+			"POWERPLAY_PSYCHO_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
@@ -168,12 +168,12 @@ local musicSets = {
 		category = "Executive Update",
 		path = "gta5/mpexecutive/powerplay_redsq",
 		stems = {
-			"POWERPLAY_REDSQ_STEM_1.mp3",
 			"POWERPLAY_REDSQ_STEM_2.mp3",
 			"POWERPLAY_REDSQ_STEM_3.mp3",
 			"POWERPLAY_REDSQ_STEM_4.mp3",
 			"POWERPLAY_REDSQ_STEM_5.mp3",
-			"POWERPLAY_REDSQ_STEM_6.mp3"
+			"POWERPLAY_REDSQ_STEM_6.mp3",
+			"POWERPLAY_REDSQ_STEM_7.mp3"
 		},
 		intensity = {
 			low = { { 1 }, { 1, 2 }, { 1, 5 } },
